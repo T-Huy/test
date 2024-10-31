@@ -7,6 +7,7 @@ import { faFacebook, faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 const cx = classNames.bind(styles);
 
 function Login() {
@@ -46,14 +47,22 @@ function Login() {
         }
 
         try {
-            const res = await axios.post('https://your-api-server.com/login', {
+            console.log('email', email);
+            console.log('password', password);
+
+            const res = await axios.post(`http://localhost:9000/user/sign-in`, {
                 email,
                 password,
             });
+            console.log('res', res);
 
             if (res.status === 200) {
-                localStorage.setItem('token', res.data.token);
+                localStorage.setItem('token', res.data.access_token);
+
+                alert('Đăng nhập thành công');
                 navigate('/');
+            } else {
+                alert('Đăng nhập thất bại');
             }
         } catch (error) {
             alert('Đăng nhập thất bại');
