@@ -1,0 +1,142 @@
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    height: 600px;
+    background-color: #fff;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2), 0px 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: calc(100% - 540px);
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.login-page__image,
+.login-page__form-container {
+    flex: 1;
+}
+
+.img {
+    max-width: 100%;
+    height: auto;
+}
+
+.login-page__form-container {
+}
+
+.login-page__form-content {
+    padding: 48px;
+}
+
+.auth-form__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+}
+
+.auth-form__heading {
+    font-size: 2.2rem;
+    font-weight: 400;
+    color: var(--text-color);
+}
+
+.auth-form__form {
+}
+
+.auth-form__group {
+}
+
+.password-container {
+    position: relative;
+}
+
+.auth-form__input {
+    width: 100%;
+    height: 40px;
+    margin-top: 16px;
+    padding: 0px 35px 0 12px;
+    font-size: 1.4rem;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    outline: none;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 65%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+}
+
+.auth-form__actions .auth-form__forgot {
+    float: right;
+    margin-top: 8px;
+    color: rgb(0, 0, 255);
+}
+
+.auth-form__controls {
+}
+.auth-form__login {
+    width: 100%;
+    margin-top: 12px;
+    color: #fff;
+    background-color: rgb(0, 0, 255);
+    padding: 12px 36px;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgb(0, 0, 200);
+    }
+}
+
+.auth-form__socials {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 8px 36px;
+    border: 1px solid #ccc;
+}
+
+.auth-form__socials--google {
+    color: #666;
+    background-color: var(--white-color);
+}
+
+.auth-form__socials-icon {
+    font-size: 1.8rem;
+}
+
+.auth-form__socials-title {
+    margin: 0 12px;
+}
+
+.sign-up {
+    text-align: center;
+    margin-top: 12px;
+
+    & .sign-up__text {
+        color: #666;
+    }
+
+    & .sign-up__link {
+        color: rgb(0, 0, 255);
+        margin-left: 12px;
+        text-decoration: underline;
+    }
+}
