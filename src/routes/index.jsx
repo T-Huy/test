@@ -1,5 +1,5 @@
-import Home from '~/pages/Home';
-import Login from '~/pages/Login';
+import Home from '../pages/Home';
+import Login from '../pages/Login';
 //Public routes
 const publicRoutes = [
     { path: '/', component: Home },
