@@ -7,9 +7,9 @@ const cx = classNames.bind(styles);
 function DefaultLayout({ children }) {
     return (
         <div className={cx('wrapper')}>
-            <Header />
+            {/* <Header /> */}
             <div className={cx('w-full')}>{children}</div>
-            <Footer />
+            {/* <Footer /> */}
         </div>
     );
 }
