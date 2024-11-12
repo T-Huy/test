@@ -1,29 +1,84 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import axios from 'axios';
 
 function DoctorScheduleManagement () {
   const [selectedDoctor, setSelectedDoctor] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
+  const token = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGVJZCI6IlIxIiwiaWF0IjoxNzMxNDExNTExLCJleHAiOjE3MzE0MTUxMTF9.ZGBDu5jcAi1lAUbv-stDhBtrw8tPte25lIq8-Zjofxg`
 
   // Danh sách các khung giờ có sẵn
   const timeSlots = [
-    "8:00 - 9:00", "9:00 - 10:00", "10:00 - 11:00", "11:00 - 12:00",
-    "13:00 - 14:00", "14:00 - 15:00", "15:00 - 16:00", "16:00 - 17:00"
+    { label: "8:00 - 9:00", value: "T1" },
+    { label: "9:00 - 10:00", value: "T2" },
+    { label: "10:00 - 11:00", value: "T3" },
+    { label: "11:00 - 12:00", value: "T4" },
+    { label: "13:00 - 14:00", value: "T5" },
+    { label: "14:00 - 15:00", value: "T6" },
+    { label: "15:00 - 16:00", value: "T7" },
+    { label: "16:00 - 17:00", value: "T8" }
   ];
 
+  useEffect(() => {
+    // Đặt ngày mặc định là ngày hiện tại khi component được tải
+    const today = new Date().toISOString().split('T')[0];
+    setSelectedDate(today);
+  }, []);
+
+  useEffect(() => {
+    const fetchDoctorInfo = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/doctor/8');
+        if (response.data.errCode === 0) {
+          setSelectedDoctor(response.data.data);
+        } else {
+          console.error('Error fetching doctor information:', response.data.errMessage);
+        }
+      } catch (error) {
+        console.error('Error fetching doctor information:', error);
+      }
+    };
+    
+    fetchDoctorInfo();
+  }, []);
+
   // Xử lý khi người dùng chọn hoặc bỏ chọn khung giờ
-  const toggleTimeSlot = (slot) => {
+  const toggleTimeSlot = (slotValue) => {
     setSelectedTimeSlots((prevSlots) =>
-      prevSlots.includes(slot)
-        ? prevSlots.filter((time) => time !== slot)
-        : [...prevSlots, slot]
+      prevSlots.includes(slotValue)
+        ? prevSlots.filter((time) => time !== slotValue)
+        : [...prevSlots, slotValue]
     );
   };
 
   // Xử lý khi nhấn nút "Lưu thông tin"
-  const handleSave = () => {
-    // Thực hiện các thao tác lưu dữ liệu
-    alert('Thông tin đã được lưu!');
+  const handleSave = async () => {
+    const requestData = {
+      doctorId: selectedDoctor.doctorId,
+      scheduleDate: selectedDate,
+      timeTypes: selectedTimeSlots
+    }
+
+    console.log('Request data:', requestData);
+    try {
+      const response = await axios.post('http://localhost:8080/schedule', requestData,{
+        headers: {
+          access_token: token
+        }
+      });
+      if (response.data.status === "OK") {
+        alert('Thông tin đã được lưu thành công!');
+      } 
+      else if(response.data.message === 'Schedule already exists'){
+        alert('Lịch làm việc cho bác sĩ đã tồn tại.');
+      }
+      else{
+        alert('Lưu thông tin không thành công: ' + response.data.message);
+      }
+    } catch (error) {
+      console.error('Error saving schedule:', error);
+      alert('Có lỗi xảy ra khi lưu thông tin.');
+    }
   };
 
   return (
@@ -33,12 +88,11 @@ function DoctorScheduleManagement () {
       <div className="flex justify-center items-center mb-6 space-x-4">
         {/* Chọn bác sĩ */}
         <div>
-          <label className="font-semibold mr-2">Chọn bác sĩ</label>
+          <label className="font-semibold mr-2">Bác sĩ</label>
           <input
             type="text"
-            value={selectedDoctor}
+            value={selectedDoctor.fullname || ''}
             onChange={(e) => setSelectedDoctor(e.target.value)}
-            placeholder="Nguyễn Duy Hưng"
             className="border p-2 rounded"
           />
         </div>
@@ -48,7 +102,7 @@ function DoctorScheduleManagement () {
           <label className="font-semibold mr-2">Chọn ngày</label>
           <input
             type="date"
-            value={selectedDate}
+            value={selectedDate || ''}
             onChange={(e) => setSelectedDate(e.target.value)}
             className="border p-2 rounded"
           />
@@ -59,11 +113,11 @@ function DoctorScheduleManagement () {
       <div className="flex justify-center space-x-4 mb-6">
         {timeSlots.map((slot) => (
           <button
-            key={slot}
-            onClick={() => toggleTimeSlot(slot)}
-            className={`p-2 border rounded ${selectedTimeSlots.includes(slot) ? 'bg-yellow-500 text-white' : 'bg-white text-black'}`}
+            key={slot.value}
+            onClick={() => toggleTimeSlot(slot.value)}
+            className={`p-2 border rounded ${selectedTimeSlots.includes(slot.value) ? 'bg-yellow-500 text-white' : 'bg-white text-black'}`}
           >
-            {slot}
+            {slot.label}
           </button>
         ))}
       </div>
