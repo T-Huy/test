@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { FaCamera } from 'react-icons/fa';
+import { axiosClient, axiosInstance } from '~/api/apiRequest';
+import { UserContext } from '~/context/UserContext';
 
 function DoctorProfile() {
     const [doctorInfo, setDoctorInfo] = useState({
@@ -16,34 +18,44 @@ function DoctorProfile() {
         image: '',
     });
 
+    const { user } = useContext(UserContext);
+
     const [selectedFile, setSelectedFile] = useState(null); // Thêm trạng thái để lưu trữ tệp ảnh
     const [previewImage, setPreviewImage] = useState(null); // Thêm trạng thái để lưu trữ URL tạm thời của ảnh
 
     console.log('Image', selectedFile);
 
     useEffect(() => {
-        // Fetch doctor info from the API
-        axios
-            .get('http://localhost:9000/doctor/8')
-            .then((response) => {
-                const data = response.data;
-                if (data.errCode === 0) {
+        const fetchData = async () => {
+            try {
+                console.log('UserId:', user.userId);
+                
+                const response = await axiosInstance.get(`/doctor/${user.userId}`);
+                console.log('Response:', response);
+                
+                if (response.errCode === 0) {
                     setDoctorInfo({
-                        name: data.data.fullname,
-                        address: data.data.address,
-                        gender: data.data.gender === 'Male' ? 'Nam' : 'Nữ',
-                        birthdate: data.data.birthDate.split('T')[0],
-                        specialty: data.data.specialtyName,
-                        phone: data.data.phoneNumber,
-                        email: data.data.email,
-                        clinic: data.data.clinicName,
-                        position: data.data.position,
-                        image: data.data.image,
+                        name: response.data.fullname,
+                        address: response.data.address,
+                        gender: response.data.gender === 'Male' ? 'Nam' : 'Nữ',
+                        birthdate: response.data.birthDate.split('T')[0],
+                        specialty: response.data.specialtyName,
+                        phone: response.data.phoneNumber,
+                        email: response.data.email,
+                        clinic: response.data.clinicName,
+                        position: response.data.position,
+                        image: response.data.image,
                     });
-                    console.log('Doctor data:', data);
                 }
-            })
-            .catch((error) => console.error('Error fetching doctor data:', error));
+                console.log('Doctor data:', response.data);
+                console.log('Doctor info:', doctorInfo);
+                
+            } catch (error) {
+                console.error('Error fetching doctor data:', error);
+                setDoctorInfo({});
+            }
+        };
+        fetchData();
     }, []);
 
     const [isEditing, setIsEditing] = useState(false);
