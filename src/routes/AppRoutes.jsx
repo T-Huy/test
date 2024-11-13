@@ -6,6 +6,7 @@ import Page404 from '~/pages/Page404';
 import AdminRoutes from '~/routes/AdminRoutes';
 import DoctorRoutes from '~/routes/DoctorRoutes';
 import HomeLayout from '~/layouts/HomeLayout';
+import DoctorInfo from '~/pages/DoctorInfo';
 
 function AppRoutes() {
     return (
@@ -15,6 +16,7 @@ function AppRoutes() {
                     <Route index element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/bac-si" element={<DoctorInfo />} />
                 </Route>
                 {AdminRoutes()}
                 {DoctorRoutes()}
