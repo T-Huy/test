@@ -79,7 +79,7 @@ function DoctorProfile () {
     axios.put('http://localhost:8080/doctor/8', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        access_token: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGVJZCI6IlIxIiwiaWF0IjoxNzMxMzM5MTQ2LCJleHAiOjE3MzEzNDI3NDZ9.GDvT6BIY8wcbkZa35cVlRtdLDRTONHQzPpMc-pdTWFQ` // Thay thế bằng token mới của bạn
+        access_token: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGVJZCI6IlIxIiwiaWF0IjoxNzMxNDI5NjY5LCJleHAiOjE3MzE0MzMyNjl9.5az4jMujwiPdNR0we2odnt-Ncjh7019WYvJxBVxhfbE` // Thay thế bằng token mới của bạn
       }
     })
       .then(response => {
