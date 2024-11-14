@@ -1,22 +1,26 @@
 import { jwtDecode } from 'jwt-decode';
-import React from 'react';
-import { useState, createContext } from 'react';
+import React, { useState, useEffect, createContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-const UserContext = createContext();
+const UserContext = createContext({ email: '', userId: '', role: '', auth: false });
 
 const UserProvider = ({ children }) => {
     const navigate = useNavigate();
     const initialUser = () => {
         const token = localStorage.getItem('token');
         if (token) {
-            const decodeToken = jwtDecode(token);
-            return {
-                email: decodeToken.email || '',
-                userId: decodeToken.userId || '',
-                role: decodeToken.roleId || '',
-                auth: true,
-            };
+            try {
+                const decodeToken = jwtDecode(token);
+                return {
+                    email: decodeToken.email || '',
+                    userId: decodeToken.userId || '',
+                    role: decodeToken.roleId || '',
+                    auth: true,
+                };
+            } catch (error) {
+                console.error('Invalid token:', error);
+                return { email: '', userId: '', role: '', auth: false };
+            }
         }
         return { email: '', userId: '', role: '', auth: false };
     };
@@ -24,27 +28,49 @@ const UserProvider = ({ children }) => {
     const [user, setUser] = useState(initialUser);
 
     const loginContext = (email, token) => {
-        const decodeToken = jwtDecode(token);
-        setUser({
-            email: email,
-            userId: decodeToken.userId,
-            role: decodeToken.roleId,
-            auth: true,
-        });
-        localStorage.setItem('token', token);
+        try {
+            const decodeToken = jwtDecode(token);
+            setUser({
+                email: email,
+                userId: decodeToken.userId,
+                role: decodeToken.roleId,
+                auth: true,
+            });
+            localStorage.setItem('token', token);
+        } catch (error) {
+            console.error('Invalid token:', error);
+        }
     };
 
     const logout = () => {
         localStorage.removeItem('token');
-        setUser((user) => ({
+        setUser({
             email: '',
             userId: '',
             role: '',
             auth: false,
-        }));
+        });
         navigate('/');
         toast.success('Đăng xuất thành công');
     };
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decodeToken = jwtDecode(token);
+                setUser({
+                    email: decodeToken.email,
+                    userId: decodeToken.userId,
+                    role: decodeToken.roleId,
+                    auth: true,
+                });
+            } catch (error) {
+                console.error('Invalid token:', error);
+                logout();
+            }
+        }
+    }, []);
 
     return <UserContext.Provider value={{ user, loginContext, logout }}>{children}</UserContext.Provider>;
 };
