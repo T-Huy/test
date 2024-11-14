@@ -1,7 +1,7 @@
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
-const baseURL = 'http://localhost:9000';
+const baseURL = 'http://localhost:8080';
 
 const axiosClient = axios.create({
     baseURL: baseURL,
@@ -33,8 +33,14 @@ axiosClient.interceptors.response.use(
 
 const refreshToken = async () => {
     try {
-        const response = await axiosClient.post('/refresh-token');
-        return response.data;
+        const response = await axiosClient.post('/refresh_token');
+        console.log('refresh_token:', response);
+
+        if (response.status === 'OK') return response.access_token;
+        else {
+            console.error('Error: ', response.message);
+            return null;
+        }
     } catch (error) {
         console.log('Error: ', error);
     }
