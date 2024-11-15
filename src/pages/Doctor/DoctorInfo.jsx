@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import axios from 'axios';
 import { FaCamera } from 'react-icons/fa';
 import { axiosClient, axiosInstance } from '~/api/apiRequest';
 import { UserContext } from '~/context/UserContext';
+import { toast } from 'react-toastify';
 
 function DoctorProfile() {
     const [doctorInfo, setDoctorInfo] = useState({
@@ -28,11 +28,11 @@ function DoctorProfile() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                console.log('UserId:', user.userId);
-                
+                // console.log('UserId:', user.userId);
+
                 const response = await axiosInstance.get(`/doctor/${user.userId}`);
-                console.log('Response:', response);
-                
+                // console.log('Response:', response);
+
                 if (response.errCode === 0) {
                     setDoctorInfo({
                         name: response.data.fullname,
@@ -47,9 +47,8 @@ function DoctorProfile() {
                         image: response.data.image,
                     });
                 }
-                console.log('Doctor data:', response.data);
-                console.log('Doctor info:', doctorInfo);
-                
+                // console.log('Doctor data:', response.data);
+                // console.log('Doctor info:', doctorInfo);
             } catch (error) {
                 console.error('Error fetching doctor data:', error);
                 setDoctorInfo({});
@@ -71,7 +70,7 @@ function DoctorProfile() {
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setIsEditing(false);
 
         console.log('Updating doctor data:', doctorInfo);
@@ -88,20 +87,23 @@ function DoctorProfile() {
             formData.append('image', selectedFile); // Thêm tệp ảnh vào FormData
         }
 
-        axios
-            .put('http://localhost:9000/doctor/8', formData, {
+        try {
+            const response = await axiosInstance.put(`/doctor/${user.userId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    access_token: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGVJZCI6IlIxIiwiaWF0IjoxNzMxNDI5NjY5LCJleHAiOjE3MzE0MzMyNjl9.5az4jMujwiPdNR0we2odnt-Ncjh7019WYvJxBVxhfbE`, // Thay thế bằng token mới của bạn
                 },
-            })
-            .then((response) => {
-                alert('Cập nhật thông tin thành công');
-            })
-            .catch((error) => {
-                console.error('Error updating doctor data:', error);
-                alert('Cập nhật thông tin thất bại');
             });
+            console.log('Response:', response);
+            if (response.errCode === 0) {
+                // Check a success code if the backend provides it
+                toast.success('Cập nhật thông tin thành công');
+            } else {
+                toast.warn(response.data.message || 'Đã xảy ra vấn đề');
+            }
+        } catch (error) {
+            // console.error('Error updating doctor data:', error);
+            toast.error('Cập nhật thông tin thất bại');
+        }
     };
 
     console.log('doctorinfo', doctorInfo);
