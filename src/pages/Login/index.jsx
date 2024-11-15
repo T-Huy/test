@@ -51,7 +51,7 @@ function Login() {
                 password,
             });
             console.log(res);
-            
+
             if (res.status === 'OK') {
                 loginContext(email, res.access_token);
                 toast.success('Đăng nhập thành công');
@@ -84,7 +84,7 @@ function Login() {
             <div className="flex-1">
                 <div className="p-12">
                     <div className="mb-6">
-                        <h3 className="text-2xl font-normal text-gray-800" >Đăng nhập</h3>
+                        <h3 className="text-2xl font-normal text-gray-800">Đăng nhập</h3>
                     </div>
                     <div>
                         <div className="mb-4">

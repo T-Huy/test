@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { axiosClient, axiosInstance } from '~/api/apiRequest';
+import { UserContext } from '~/context/UserContext';
+import { toast } from 'react-toastify';
 
 function DoctorScheduleManagement() {
     const [selectedDoctor, setSelectedDoctor] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
-
-    const token = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGVJZCI6IlIxIiwiaWF0IjoxNzMxNDY5MTY5LCJleHAiOjE3MzE0NzI3Njl9.Yf3HuSVo2gpZ8gJr1KsvfbA2KrKshXRrGqyc3XPvEkI`;
+    const { user } = useContext(UserContext);
 
     // Danh sách các khung giờ có sẵn
     const timeSlots = [
@@ -29,16 +31,12 @@ function DoctorScheduleManagement() {
     // Lấy thông tin lịch làm việc theo ngày
     const fetchScheduleByDate = async (date) => {
         try {
-            const response = await axios.get(`http://localhost:9000/schedule/8?date=${date}`, {
-                headers: {
-                    access_token: token,
-                },
-            });
-            if (response.data.status === 'OK') {
-                const bookedSlots = response.data.data.length > 0 ? response.data.data[0].timeTypes : [];
+            const response = await axiosInstance.get(`/schedule/${user.userId}?date=${date}`);
+            if (response.status === 'OK') {
+                const bookedSlots = response.data.length > 0 ? response.data[0].timeTypes : [];
                 setSelectedTimeSlots(bookedSlots);
             } else {
-                console.error('Error fetching schedule:', response.data.message);
+                console.error('Error fetching schedule:', response.message);
                 setSelectedTimeSlots([]); // Nếu không có lịch thì để rỗng
             }
         } catch (error) {
@@ -57,11 +55,12 @@ function DoctorScheduleManagement() {
     useEffect(() => {
         const fetchDoctorInfo = async () => {
             try {
-                const response = await axios.get('http://localhost:9000/doctor/8');
-                if (response.data.errCode === 0) {
-                    setSelectedDoctor(response.data.data);
+                const response = await axiosInstance.get(`/doctor/${user.userId}`);
+                console.log('Doctor infooo:', response);
+                if (response.errCode === 0) {
+                    setSelectedDoctor(response.data);
                 } else {
-                    console.error('Error fetching doctor information:', response.data.errMessage);
+                    console.error('Error fetching doctor information:', response.errMessage);
                 }
             } catch (error) {
                 console.error('Error fetching doctor information:', error);
@@ -88,21 +87,17 @@ function DoctorScheduleManagement() {
 
         console.log('Request data:', requestData);
         try {
-            const response = await axios.put('http://localhost:9000/schedule/8', requestData, {
-                headers: {
-                    access_token: token,
-                },
-            });
-            if (response.data.status === 'OK') {
-                alert('Thông tin đã được lưu thành công!');
-            } else if (response.data.message === 'Schedule already exists') {
-                alert('Lịch làm việc cho bác sĩ đã tồn tại.');
+            const response = await axiosInstance.put(`/schedule/${user.userId}`, requestData);
+            if (response.status === 'OK') {
+                toast.success('Lưu thành công!');
+            } else if (response.message === 'Schedule already exists') {
+                toast.error('Lịch làm việc cho bác sĩ đã tồn tại.');
             } else {
-                alert('Lưu thông tin không thành công: ' + response.data.message);
+                toast.error('Lưu thông tin không thành công: ' + response.message);
             }
         } catch (error) {
             console.error('Error saving schedule:', error);
-            alert('Có lỗi xảy ra khi lưu thông tin.');
+            toast.error('Có lỗi xảy ra khi lưu thông tin.');
         }
     };
 

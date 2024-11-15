@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { axiosClient, axiosInstance } from '~/api/apiRequest';
+import { UserContext } from '~/context/UserContext';
+import { toast } from 'react-toastify';
 
 function PatientManagement() {
     const [appointments, setAppointments] = useState([]);
     const [selectedDate, setSelectedDate] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
-    const token = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInJvbGVJZCI6IlIxIiwiaWF0IjoxNzMxNDY5MTY5LCJleHAiOjE3MzE0NzI3Njl9.Yf3HuSVo2gpZ8gJr1KsvfbA2KrKshXRrGqyc3XPvEkI`;
 
     useEffect(() => {
         // Đặt ngày mặc định là ngày hiện tại khi component được tải
@@ -22,16 +23,13 @@ function PatientManagement() {
             setError(null);
 
             try {
-                const response = await axios.get(`http://localhost:9000/booking/doctor/8?date=${selectedDate}`, {
-                    headers: {
-                        access_token: token,
-                    },
-                });
+                const response = await axiosInstance.get(`/booking/doctor/8?date=${selectedDate}`);
+                console.log('Response::', response);
 
-                if (response.data.status === 'OK') {
-                    setAppointments(response.data.data);
+                if (response.status === 'OK') {
+                    setAppointments(response.data);
                 } else {
-                    console.error('Failed to fetch data:', response.data.message);
+                    console.error('Failed to fetch data:', response.message);
                     setAppointments([]);
                 }
             } catch (error) {
@@ -55,23 +53,16 @@ function PatientManagement() {
 
     const updateStatus = async (appointmentId, status) => {
         try {
-            const response = await axios.put(
-                `http://localhost:9000/booking/${appointmentId}`,
-                { status },
-                {
-                    headers: {
-                        access_token: token,
-                    },
-                },
-            );
+            const response = await axiosInstance.put(`/booking/${appointmentId}`, { status });
 
-            if (response.data.status === 'OK') {
+            if (response.status === 'OK') {
                 // Update the local state to reflect the status change
                 setAppointments((prevAppointments) =>
                     prevAppointments.map((appointment) =>
                         appointment.bookingId === appointmentId ? { ...appointment, status: valueVi } : appointment,
                     ),
                 );
+                toast.success('Cập nhật thành công!');
             } else {
                 setError('Failed to update status');
             }
