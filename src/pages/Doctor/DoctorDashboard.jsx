@@ -7,9 +7,6 @@ import WorkScheduleManagement from './WorkScheduleManagement';
 const DoctorDashboard = () => {
     // State để lưu tab đang chọn
     const [selectedTab, setSelectedTab] = useState('patients'); // Mặc định là "patients"
-
-
-
     return (
         <div className="flex h-screen">
             {/* Sidebar */}

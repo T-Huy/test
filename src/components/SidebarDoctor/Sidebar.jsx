@@ -3,6 +3,10 @@ import axios from 'axios';
 import { FaUser, FaCalendarAlt, FaClipboardList, FaSignOutAlt } from 'react-icons/fa';
 import pngegg from '../../assets/img/pngegg.png';
 import { UserContext } from '~/context/UserContext';
+import { axiosClient, axiosInstance } from '~/api/apiRequest';
+import { toast } from 'react-toastify';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
 
 const Sidebar = ({ onSelectTab, selectedTab }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -13,25 +17,40 @@ const Sidebar = ({ onSelectTab, selectedTab }) => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [oldPassword, setOldPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const [showPassword_1, setShowPassword_1] = useState(false);
+    const toggleShowPassword_1 = () => {
+        setShowPassword_1(!showPassword_1);
+    };
+
+    const [showPassword_2, setShowPassword_2] = useState(false);
+    const toggleShowPassword_2 = () => {
+        setShowPassword_2(!showPassword_2);
+    };
 
     const { logout } = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     useEffect(() => {
-        // Fetch doctor info from API
-        axios
-            .get('http://localhost:9000/doctor/8') // Thay thế bằng endpoint của bạn
-            .then((response) => {
-                const data = response.data;
-                if (data.errCode === 0) {
+        const fetchData = async () => {
+            try {
+                const response = await axiosInstance.get(`/doctor/${user.userId}`);
+                if (response.errCode === 0) {
                     setDoctorInfo({
-                        name: data.data.fullname,
-                        image: data.data.image,
-                        userId: data.data.doctorId,
+                        name: response.data.fullname,
+                        image: response.data.image,
+                        userId: response.data.doctorId,
                     });
                 }
-                setLoading(false);
-            })
-            .catch((error) => console.error('Error fetching doctor data:', error));
+            } catch (error) {
+                console.log('Error fetching doctor data:', error);
+            }
+        };
+        fetchData();
     }, []);
 
     const handleProfileClick = () => {
@@ -44,39 +63,37 @@ const Sidebar = ({ onSelectTab, selectedTab }) => {
 
     console.log('Doctor Info:', doctorInfo);
 
-    const handleChangePassword = () => {
+    const handleChangePassword = async () => {
         if (newPassword === confirmPassword) {
             // Gửi yêu cầu PUT tới API để thay đổi mật khẩu
-            axios
-                .post(
-                    'http://localhost:9000/user/update-password',
-                    {
-                        userId: doctorInfo.userId,
-                        oldPassword: oldPassword,
-                        newPassword: newPassword,
-                        confirmPassword: confirmPassword,
-                    },
-                    {
-                        headers: {
-                            access_token: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsInJvbGVJZCI6IlIzIiwiaWF0IjoxNzMxNDc5MDE0LCJleHAiOjE3MzE0ODI2MTR9.zpm7yuaj03_xVXPx5XhiUYoq8_-quD2VgNTnyrWbU6A`,
-                        },
-                    },
-                )
-                .then((response) => {
-                    const { status, message } = response.data;
-                    if (status === 'OK') {
-                        alert('Mật khẩu đã được thay đổi thành công');
-                        setShowChangePasswordModal(false); // Đóng modal sau khi thành công
-                    } else {
-                        alert(message); // Hiển thị thông báo lỗi
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error changing password:', error);
-                    alert('Đã có lỗi xảy ra khi thay đổi mật khẩu');
-                });
+            const response = await axiosInstance.post('/user/update-password', {
+                userId: doctorInfo.userId,
+                oldPassword: oldPassword,
+                newPassword: newPassword,
+                confirmPassword: confirmPassword,
+            });
+            // console.log('Response::', response);
+            if (response.status === 'OK') {
+                toast.success('Mật khẩu đã được thay đổi thành công');
+                setShowChangePasswordModal(false);
+            } else {
+                toast.error(response.message);
+            }
+            // .then((response) => {
+            //     const { status, message } = response.data;
+            //     if (status === 'OK') {
+            //         alert('Mật khẩu đã được thay đổi thành công');
+            //         setShowChangePasswordModal(false); // Đóng modal sau khi thành công
+            //     } else {
+            //         alert(message); // Hiển thị thông báo lỗi
+            //     }
+            // })
+            // .catch((error) => {
+            //     console.error('Error changing password:', error);
+            //     alert('Đã có lỗi xảy ra khi thay đổi mật khẩu');
+            // });
         } else {
-            alert('Mật khẩu mới và xác nhận mật khẩu không khớp');
+            toast.error('Mật khẩu mới và xác nhận mật khẩu không khớp');
         }
     };
 
@@ -135,7 +152,7 @@ const Sidebar = ({ onSelectTab, selectedTab }) => {
                 <div className="flex items-center space-x-3 cursor-pointer" onClick={handleProfileClick}>
                     <img
                         // src={doctorInfo.image ? `${IMAGE_URL}${doctorInfo.image}` : pngegg}
-                        src={pngegg}
+                        src={`${IMAGE_URL}${doctorInfo.image}`}
                         alt="Doctor Avatar"
                         className="w-12 h-12 rounded-full"
                     />
@@ -163,53 +180,77 @@ const Sidebar = ({ onSelectTab, selectedTab }) => {
 
             {/* Modal Đổi Mật Khẩu */}
             {showChangePasswordModal && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded shadow-lg w-128">
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-20 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded shadow-lg w-[385px]">
                         {' '}
                         {/* Thay w-96 thành w-128 để modal rộng hơn */}
-                        <h3 className="text-xl font-semibold mb-4">Đổi Mật Khẩu</h3>
-                        <div className="mb-4">
-                            <label htmlFor="oldPassword" className="block text-sm">
+                        <h3 className="text-3xl font-semibold mb-4">Đổi Mật Khẩu</h3>
+                        <div className="mb-4 relative">
+                            <label htmlFor="oldPassword" className="block text-2xl">
                                 Mật khẩu cũ
                             </label>
                             <input
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 id="oldPassword"
                                 className="w-full p-2 border border-gray-300 rounded"
                                 value={oldPassword}
                                 onChange={(e) => setOldPassword(e.target.value)}
                             />
+                            <button
+                                type="button"
+                                className="absolute top-[70%] right-3 transform -translate-y-1/2 text-gray-500 "
+                                onClick={toggleShowPassword}
+                            >
+                                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                            </button>
                         </div>
-                        <div className="mb-4">
-                            <label htmlFor="newPassword" className="block text-sm">
+                        <div className="mb-4 relative">
+                            <label htmlFor="newPassword" className="block text-2xl">
                                 Mật khẩu mới
                             </label>
                             <input
-                                type="password"
+                                type={showPassword_1 ? 'text' : 'password'}
                                 id="newPassword"
                                 className="w-full p-2 border border-gray-300 rounded"
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                             />
+                            <button
+                                type="button"
+                                className="absolute top-[70%] right-3 transform -translate-y-1/2 text-gray-500 "
+                                onClick={toggleShowPassword_1}
+                            >
+                                <FontAwesomeIcon icon={showPassword_1 ? faEyeSlash : faEye} />
+                            </button>
                         </div>
-                        <div className="mb-4">
-                            <label htmlFor="confirmPassword" className="block text-sm">
+                        <div className="mb-4 relative">
+                            <label htmlFor="confirmPassword" className="block text-2xl">
                                 Xác nhận mật khẩu
                             </label>
                             <input
-                                type="password"
+                                type={showPassword_2 ? 'text' : 'password'}
                                 id="confirmPassword"
                                 className="w-full p-2 border border-gray-300 rounded"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                             />
+                            <button
+                                type="button"
+                                className="absolute top-[70%] right-3 transform -translate-y-1/2 text-gray-500 "
+                                onClick={toggleShowPassword_2}
+                            >
+                                <FontAwesomeIcon icon={showPassword_2 ? faEyeSlash : faEye} />
+                            </button>
                         </div>
                         <div className="flex justify-between">
-                            <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={handleChangePassword}>
+                            <button
+                                className="px-10 py-5 bg-blue-500 text-white rounded mt-6"
+                                onClick={handleChangePassword}
+                            >
                                 Lưu
                             </button>
                             <button
-                                className="px-4 py-2 bg-gray-300 text-black rounded"
+                                className="px-10 py-5 bg-gray-300 text-black rounded mt-6"
                                 onClick={() => setShowChangePasswordModal(false)}
                             >
                                 Hủy
