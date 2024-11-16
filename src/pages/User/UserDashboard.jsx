@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import Sidebar from '~/components/SidebarUser/Sidebar'; // Adjust the path to your Sidebar component
 import UserProfile from './UserProfile';
 import AppointmentManagement from './AppointmentManagement';
 import PatientRecords from './PatientRecords';
+import ChangePassword from './ChangePassword';
 
 const UserDashboard = () => {
     // State to track the currently selected tab
@@ -17,17 +18,22 @@ const UserDashboard = () => {
     //     if (tab === 'appointments') navigate('/user/appointments');
     //     if (tab === 'records') navigate('/user/records');
     // };
+    const handleSelectTab = (tab) => {
+        setSelectedTab(tab);
+    };
 
     return (
         <div className="flex h-screen">
             {/* Sidebar */}
-            <Sidebar onSelectTab={setSelectedTab} selectedTab={selectedTab} />
+            <Sidebar onSelectTab={handleSelectTab} selectedTab={selectedTab} />
 
             {/* Main content */}
             <div className="flex-1 p-6 overflow-auto">
-                {selectedTab === 'profile' && <UserProfile />}
+                <Outlet />
+                {/* {selectedTab === 'profile' && <UserProfile />}
                 {selectedTab === 'appointments' && <AppointmentManagement />}
                 {selectedTab === 'patientRecords' && <PatientRecords />}
+                {selectedTab === 'changePassWord' && <ChangePassword />} */}
                 {/* <Routes>
                     <Route path="/user/profile" element={<UserProfile />} />
                     <Route path="/user/appointments" element={<AppointmentManagement />} />
