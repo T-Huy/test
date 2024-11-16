@@ -6,14 +6,16 @@ import { FaRegAddressBook } from 'react-icons/fa';
 import { IoLogOutOutline } from 'react-icons/io5';
 import { IoMdKey } from 'react-icons/io';
 import { axiosInstance } from '~/api/apiRequest';
+import avatar from '../../assets/img/avatar.png';
 function Header() {
-    const [fullName, setFullName] = useState();
+    const IMAGE_URL = 'http://localhost:8080/uploads';
 
     const { user, logout } = useContext(UserContext);
     const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+    const [userInfo, setUserInfo] = useState({});
     const handleLogout = () => {
+        setIsDropdownOpen(false);
         logout();
     };
 
@@ -23,19 +25,27 @@ function Header() {
                 try {
                     const response = await axiosInstance.get(`/user/${user.userId}`);
                     if (response.status === 'OK') {
-                        setFullName(response.data.fullname);
+                        const imageUrl = response.data.image ? `${IMAGE_URL}/${response.data.image}` : avatar;
+                        const img = new Image();
+                        img.src = imageUrl;
+                        img.onload = () => {
+                            setUserInfo({ ...response.data, image: imageUrl });
+                        };
+                        img.onerror = () => {
+                            setUserInfo({ ...response.data, image: avatar });
+                        };
                     } else {
                         console.error('Failed to fetch data:', response.message);
-                        setFullName([]);
+                        setUserInfo([]);
                     }
                 } catch (error) {
                     console.error('Error fetching appointments:', error);
-                    setFullName([]);
+                    setUserInfo([]);
                 }
             }
         };
         fetchFullName();
-    });
+    }, [user]);
 
     return (
         <header className="bg-transparent shadow fixed top-0 left-0 right-0 z-50">
@@ -99,12 +109,14 @@ function Header() {
                                     <div>
                                         <img
                                             className="w-14 h-14 rounded-full"
-                                            src="https://i.pinimg.com/736x/21/1a/6e/211a6e39c8db24b8cc967f3f0aeb8da0.jpg"
+                                            src={userInfo && userInfo.image ? userInfo.image : avatar}
                                             alt="Avatar"
                                         />
                                     </div>
                                     <div className="ml-2">
-                                        <p className="text-2xl font-bold">{fullName}</p>
+                                        <p className="text-2xl font-bold">
+                                            {userInfo && userInfo.fullname ? userInfo.fullname : 'Guest'}
+                                        </p>
                                     </div>
                                 </div>
                                 {isDropdownOpen && (
