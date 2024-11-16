@@ -1,6 +1,7 @@
-import { Outlet} from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { useContext } from 'react';
 import { UserContext } from '~/context/UserContext';
+import DoctorDashboard from '~/pages/Doctor/DoctorDashboard';
 
 function DoctorLayout() {
     console.log('đi vào DoctorLayout');
@@ -16,7 +17,7 @@ function DoctorLayout() {
                 <button onClick={handleLogout}>Logout</button>
             </header> */}
             <main>
-                <Outlet />
+                <DoctorDashboard />
             </main>
             {/* <footer>Footer doctor</footer> */}
         </>

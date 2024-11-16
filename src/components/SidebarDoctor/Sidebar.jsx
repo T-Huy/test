@@ -7,6 +7,7 @@ import { axiosClient, axiosInstance } from '~/api/apiRequest';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Sidebar = ({ onSelectTab, selectedTab }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -102,6 +103,16 @@ const Sidebar = ({ onSelectTab, selectedTab }) => {
     useEffect(() => {
         onSelectTab('overview');
     }, []);
+
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const menuItems = [
+        { label: 'Thông tin cá nhân', icon: <FaUser />, path: '/doctor/profile' },
+        { label: 'Quản lý lịch hẹn', icon: <FaCalendarAlt />, path: '/doctor/manage' },
+        { label: 'Quản lý lịch làm việc', icon: <FaClipboardList />, path: '/doctor/schedule' },
+    ];
+
     return (
         <div className="w-fit h-screen bg-white text-black flex flex-col shadow-lg">
             <div className="text-xl font-bold text-center py-6 border-b border-gray-200 flex items-center">
@@ -114,37 +125,24 @@ const Sidebar = ({ onSelectTab, selectedTab }) => {
                 <div className="ml-4 text-left">
                     <p>EasyMed</p>
                     <small>
-                        Chăm sóc sức khỏe, <br /> bảo vệ cuộc sống
+                        Chăm sóc sức khỏe <br /> Bảo vệ cuộc sống
                     </small>
                 </div>
             </div>
 
             <div className="flex-1">
                 <ul className="space-y-2 mt-4 px-4">
-                    <li
-                        onClick={() => onSelectTab('overview')}
-                        className={`p-3 cursor-pointer flex items-center rounded-md hover:bg-blue-100 ${
-                            selectedTab === 'overview' ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
-                        }`}
-                    >
-                        <FaUser className="mr-3" /> Thông tin cá nhân
-                    </li>
-                    <li
-                        onClick={() => onSelectTab('appointments')}
-                        className={`p-3 cursor-pointer flex items-center rounded-md hover:bg-blue-100 ${
-                            selectedTab === 'appointments' ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
-                        }`}
-                    >
-                        <FaCalendarAlt className="mr-3" /> Quản lý Đặt lịch khám
-                    </li>
-                    <li
-                        onClick={() => onSelectTab('schedule')}
-                        className={`p-3 cursor-pointer flex items-center rounded-md hover:bg-blue-100 ${
-                            selectedTab === 'schedule' ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
-                        }`}
-                    >
-                        <FaClipboardList className="mr-3" /> Quản lý Lịch làm việc
-                    </li>
+                    {menuItems.map((item) => (
+                        <li
+                            key={item.path}
+                            onClick={() => navigate(item.path)}
+                            className={`p-3 cursor-pointer flex items-center rounded-md hover:bg-blue-100 ${
+                                location.pathname === item.path ? 'bg-blue-100 text-blue-600' : 'text-gray-700'
+                            }`}
+                        >
+                            {item.icon} <span className="ml-3">{item.label}</span>
+                        </li>
+                    ))}
                 </ul>
             </div>
 
