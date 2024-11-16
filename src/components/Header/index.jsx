@@ -1,11 +1,14 @@
 import { NavLink } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { UserContext } from '~/context/UserContext';
 import { FiMenu } from 'react-icons/fi';
 import { FaRegAddressBook } from 'react-icons/fa';
 import { IoLogOutOutline } from 'react-icons/io5';
 import { IoMdKey } from 'react-icons/io';
+import { axiosInstance } from '~/api/apiRequest';
 function Header() {
+    const [fullName, setFullName] = useState();
+
     const { user, logout } = useContext(UserContext);
     const [isOpen, setIsOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -13,6 +16,26 @@ function Header() {
     const handleLogout = () => {
         logout();
     };
+
+    useEffect(() => {
+        const fetchFullName = async () => {
+            if (user.userId) {
+                try {
+                    const response = await axiosInstance.get(`/user/${user.userId}`);
+                    if (response.status === 'OK') {
+                        setFullName(response.data.fullname);
+                    } else {
+                        console.error('Failed to fetch data:', response.message);
+                        setFullName([]);
+                    }
+                } catch (error) {
+                    console.error('Error fetching appointments:', error);
+                    setFullName([]);
+                }
+            }
+        };
+        fetchFullName();
+    });
 
     return (
         <header className="bg-transparent shadow fixed top-0 left-0 right-0 z-50">
@@ -81,7 +104,7 @@ function Header() {
                                         />
                                     </div>
                                     <div className="ml-2">
-                                        <p className="text-2xl">Lê Tấn Huy</p>
+                                        <p className="text-2xl font-bold">{fullName}</p>
                                     </div>
                                 </div>
                                 {isDropdownOpen && (
@@ -89,14 +112,14 @@ function Header() {
                                 )}
                                 {isDropdownOpen && (
                                     <div
-                                        className="absolute -right-6 backdrop-blur-md bg-white/30 mt-3 py-2 w-56 min-w-64 text-left rounded-xl border border-gray-200   shadow-[0_0_1px_0_rgba(0,0,0,0.04),0_2px_6px_0_rgba(0,0,0,0.04),0_10px_20px_0_rgba(0,0,0,0.04)]"
+                                        className="absolute -right-6  bg-white mt-3 py-2 w-56 min-w-64 text-left rounded-xl border border-gray-200   shadow-[0_0_1px_0_rgba(0,0,0,0.04),0_2px_6px_0_rgba(0,0,0,0.04),0_10px_20px_0_rgba(0,0,0,0.04)]"
                                         onMouseEnter={() => setIsDropdownOpen(true)}
                                         onMouseLeave={() => setIsDropdownOpen(false)}
                                     >
                                         <ul className="py-1">
                                             <li className="group px-4 py-2 text-left text-2xl font-medium hover:bg-slate-100 cursor-pointer flex items-center">
                                                 <NavLink
-                                                    to="/prifile"
+                                                    to="/user/profile"
                                                     className={({ isActive }) =>
                                                         isActive
                                                             ? 'text-blue-500 flex items-center w-full'
@@ -109,7 +132,7 @@ function Header() {
                                             </li>
                                             <li className="group px-4 py-2 text-left text-2xl font-medium hover:bg-slate-100 cursor-pointer flex items-center">
                                                 <NavLink
-                                                    to="/change-password"
+                                                    to="/user/change-password"
                                                     className={({ isActive }) =>
                                                         isActive
                                                             ? 'text-blue-500 flex items-center w-full'
