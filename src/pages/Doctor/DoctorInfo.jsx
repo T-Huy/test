@@ -205,8 +205,8 @@ function DoctorProfile() {
                             name="email"
                             value={doctorInfo.email}
                             onChange={handleChange}
-                            disabled={!isEditing}
-                            className={`w-1/2 p-2 border rounded ${isEditing ? 'bg-white' : 'bg-gray-100'}`}
+                            disabled={true}
+                            className={`w-1/2 p-2 border rounded ${isEditing ? 'bg-gray-200' : 'bg-gray-100'}`}
                         />
                     </div>
                 </div>

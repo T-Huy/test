@@ -3,10 +3,11 @@ import Sidebar from '~/components/SidebarDoctor/Sidebar'; // Import Sidebar comp
 import DoctorInfo from './DoctorInfo'; // Import các component chức năng
 import AppointmentManagement from './AppointmentManagement';
 import WorkScheduleManagement from './WorkScheduleManagement';
+import { Outlet } from 'react-router-dom';
 
 const DoctorDashboard = () => {
     // State để lưu tab đang chọn
-    const [selectedTab, setSelectedTab] = useState('patients'); // Mặc định là "patients"
+    const [selectedTab, setSelectedTab] = useState('overview'); // Mặc định là "patients"
     return (
         <div className="flex h-screen">
             {/* Sidebar */}
@@ -14,10 +15,11 @@ const DoctorDashboard = () => {
 
             {/* Nội dung chính */}
             <div className="flex-1 p-6 overflow-auto">
+                <Outlet />
                 {/* Render các component tương ứng theo tab đã chọn */}
-                {selectedTab === 'overview' && <DoctorInfo />}
+                {/* {selectedTab === 'overview' && <DoctorInfo />}
                 {selectedTab === 'appointments' && <AppointmentManagement />}
-                {selectedTab === 'schedule' && <WorkScheduleManagement />}
+                {selectedTab === 'schedule' && <WorkScheduleManagement />} */}
             </div>
         </div>
     );
