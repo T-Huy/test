@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { FaUser, FaCalendarAlt, FaClipboardList, FaSignOutAlt } from 'react-icons/fa';
-import pngegg from '../../assets/img/pngegg.png';
+import pngegg from '../../assets/img/avatar.png';
 import { UserContext } from '~/context/UserContext';
 import { axiosClient, axiosInstance } from '~/api/apiRequest';
 import { toast } from 'react-toastify';

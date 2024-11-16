@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Await, useSearchParams } from 'react-router-dom'; // Dùng để lấy `patientRecordId` từ URL
+import { Await, useNavigate, useSearchParams } from 'react-router-dom'; // Dùng để lấy `patientRecordId` từ URL
 import { toast } from 'react-toastify';
 import { axiosInstance } from '~/api/apiRequest'; // Đảm bảo bạn đã config axios
 import { UserContext } from '~/context/UserContext';
 
 function AddRecord() {
+    const navigate = useNavigate();
     const { user } = useContext(UserContext);
 
     const [formData, setFormData] = useState({
@@ -38,7 +39,7 @@ function AddRecord() {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: name === 'gender' ? (value === 'Nam' ? 'Male' : 'Female') : value,
+            [name]: name === 'gender' ? (value === 'Nam' ? 'Male' : value === 'Nữ' ? 'Female' : value) : value,
         }));
     };
 
@@ -53,6 +54,7 @@ function AddRecord() {
 
             if (response.errCode === 0) {
                 toast.success(response.message); // Thông báo thành công
+                navigate('/user/records')
                 handleReset(); // Reset form nếu thành công
             } else {
                 toast.error('Tạo mới thất bại: ' + response.message); // Thông báo lỗi
@@ -125,7 +127,7 @@ function AddRecord() {
                         </label>
                         <select
                             name="gender"
-                            value={formData.gender === 'Male' ? 'Nam' : 'Nữ'}
+                            value={formData.gender === 'Male' ? 'Nam' : formData.gender === 'Female' ? 'Nữ' : ''}
                             onChange={handleChange}
                             className="w-full p-3 border rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
                             required
