@@ -3,12 +3,14 @@ import axios from 'axios';
 import { axiosClient, axiosInstance } from '~/api/apiRequest';
 import { UserContext } from '~/context/UserContext';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 function PatientManagement() {
     const [appointments, setAppointments] = useState([]);
     const [selectedDate, setSelectedDate] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const navigate = useNavigate(); // Thêm useNavigate
 
     useEffect(() => {
         // Đặt ngày mặc định là ngày hiện tại khi component được tải
@@ -51,23 +53,33 @@ function PatientManagement() {
         setSelectedDate(e.target.value);
     };
 
-    const updateStatus = async (appointmentId, status) => {
+    const updateStatus = async (appointmentId, statusKey) => {
         try {
-            const response = await axiosInstance.put(`/booking/${appointmentId}`, { status });
+            const response = await axiosInstance.put(`/booking/${appointmentId}`, { status: statusKey });
 
             if (response.status === 'OK') {
-                // Update the local state to reflect the status change
+                // Cập nhật trạng thái trực tiếp trên danh sách appointments
                 setAppointments((prevAppointments) =>
                     prevAppointments.map((appointment) =>
-                        appointment.bookingId === appointmentId ? { ...appointment, status: valueVi } : appointment,
+                        appointment.bookingId === appointmentId
+                            ? {
+                                  ...appointment,
+                                  status: {
+                                      ...appointment.status,
+                                      keyMap: statusKey,
+                                      valueVi: statusKey === 'S3' ? 'Hoàn thành' : 'Hủy',
+                                  },
+                              }
+                            : appointment,
                     ),
                 );
-                toast.success('Cập nhật thành công!');
+                toast.success('Cập nhật trạng thái thành công!');
             } else {
-                setError('Failed to update status');
+                toast.error('Cập nhật trạng thái thất bại.');
             }
         } catch (error) {
-            setError('Error updating status');
+            console.error('Error updating status:', error);
+            toast.error('Có lỗi xảy ra khi cập nhật trạng thái.');
         }
     };
 

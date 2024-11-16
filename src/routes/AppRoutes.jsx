@@ -11,6 +11,7 @@ import UserDashboard from '~/pages/User/UserDashboard';
 import UserProfile from '~/pages/User/UserProfile';
 import PatientRecords from '~/pages/User/PatientRecords';
 import AppointmentManagement from '~/pages/User/AppointmentManagement';
+import UserRoutes from './UserRoutes';
 
 function AppRoutes() {
     return (
@@ -21,13 +22,14 @@ function AppRoutes() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/bac-si" element={<DoctorInfo />} />
-                    <Route path="/user" element={<UserDashboard />} />
+                    {/* <Route path="/user" element={<UserDashboard />} /> */}
                     {/* <Route path="/user/profile" element={<UserProfile />} />
                     <Route path="/user/appointments" element={<AppointmentManagement />} />
                     <Route path="/user/records" element={<PatientRecords />} /> */}
                 </Route>
                 {AdminRoutes()}
                 {DoctorRoutes()}
+                {UserRoutes()}
                 <Route path="*" element={<Page404 />} />
             </Routes>
         </>
