@@ -23,7 +23,7 @@ const UserDashboard = () => {
     };
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen mt-20">
             {/* Sidebar */}
             <Sidebar onSelectTab={handleSelectTab} selectedTab={selectedTab} />
 
