@@ -6,12 +6,15 @@ import Page404 from '~/pages/Page404';
 import AdminRoutes from '~/routes/AdminRoutes';
 import DoctorRoutes from '~/routes/DoctorRoutes';
 import HomeLayout from '~/layouts/HomeLayout';
-import DoctorInfo from '~/pages/DoctorInfo';
+import DoctorInfo from '~/pages/User/DoctorInfo';
 import UserDashboard from '~/pages/User/UserDashboard';
 import UserProfile from '~/pages/User/UserProfile';
 import PatientRecords from '~/pages/User/PatientRecords';
 import AppointmentManagement from '~/pages/User/AppointmentManagement';
 import UserRoutes from './UserRoutes';
+import AllDoctor from '~/pages/User/AllDoctor';
+import ChoosePatientRecord from '~/pages/User/ChoosePatientRecords';
+import ConfirmInfomation from '~/pages/User/ConfirmInfomation';
 
 function AppRoutes() {
     return (
@@ -21,7 +24,11 @@ function AppRoutes() {
                     <Route index element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
-                    <Route path="/bac-si" element={<DoctorInfo />} />
+                    <Route path="/bac-si" element={<AllDoctor />} />
+                    <Route path="/bac-si/get" element={<DoctorInfo />} />
+                    <Route path="/bac-si/get/record" element={<ChoosePatientRecord />} />
+                    <Route path="/bac-si/get/record/confirm" element={<ConfirmInfomation />} />
+
                     {/* <Route path="/user" element={<UserDashboard />} /> */}
                     {/* <Route path="/user/profile" element={<UserProfile />} />
                     <Route path="/user/appointments" element={<AppointmentManagement />} />

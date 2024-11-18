@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import ConfirmationModal from '~/components/Confirm/ConfirmationModal';
 
 const AppointmentManagement = () => {
-    const [activeTab, setActiveTab] = useState('cancelled');
+    const [activeTab, setActiveTab] = useState('paid');
     const [appointments, setAppointments] = useState([]);
     const [error, setError] = useState(null);
     const { user } = useContext(UserContext);
@@ -65,6 +65,8 @@ const AppointmentManagement = () => {
             const response = await axiosInstance.put(`/booking/${selectedBookingId}`, {
                 status: 'S4',
             });
+
+            console.log('Responsese:', response);
 
             if (response.status === 'OK') {
                 toast.success('Hủy lịch hẹn thành công.');
