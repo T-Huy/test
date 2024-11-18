@@ -148,6 +148,7 @@ function Home() {
     //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fbinhthanhhcm%2Fweb%2Flogo.png%3Ft%3DTue%2520Sep%252013%25202022%252010%3A08%3A08%2520GMT%2B0700%2520(Indochina%2520Time)&w=256&q=75',
     //     },
     // ];
+    const IMAGE_URL = 'http://localhost:9000/uploads/';
 
     const specialties = [
         {
@@ -400,9 +401,9 @@ function Home() {
                                             <div className="flex flex-col items-center gap-4">
                                                 <div className="flex justify-center items-center h-[160px] w-[160px] rounded-full overflow-hidden">
                                                     <img
-                                                        src={`http://localhost:${import.meta.env.VITE_BE_PORT}/uploads/${
-                                                            facility.image
-                                                        }`}
+                                                        src={`http://localhost:${
+                                                            import.meta.env.VITE_BE_PORT
+                                                        }/uploads/${facility.image}`}
                                                         alt={facility.name}
                                                         className="object-cover w-full h-full"
                                                     />
@@ -462,7 +463,9 @@ function Home() {
                                         <div className="flex flex-col items-center gap-4">
                                             <div className="flex justify-center items-center h-[160px] w-[160px] rounded-full overflow-hidden">
                                                 <img
-                                                    src={doctor.image}
+                                                    src={`http://localhost:${import.meta.env.VITE_BE_PORT}/uploads/${
+                                                        doctor.image
+                                                    }`}
                                                     alt={doctor.name}
                                                     className="object-cover w-full h-full"
                                                 />
