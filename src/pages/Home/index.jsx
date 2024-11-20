@@ -21,7 +21,6 @@ function Home() {
         'https://i.pinimg.com/736x/36/c5/28/36c5286f8f150bf662214022935332c4.jpg',
     ];
 
-
     const IMAGE_URL = 'http://localhost:9000/uploads/';
 
     const specialties = [
@@ -236,19 +235,19 @@ function Home() {
             <div>
                 <div className="h-[500px] bg-sky-100 relative overflow-hidden mt-20">
                     {/* Background image */}
-                        {images.map((image, index) => (
-                            <div
-                                key={index}
-                                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                                    currentImageIndex === index ? 'opacity-100 z-10' : 'opacity-0'
-                                }`}
-                                style={{
-                                    backgroundImage: `url(${image})`,
-                                    backgroundSize: 'cover',
-                                    backgroundPosition: 'center',
-                                }}
-                            ></div>
-                        ))}
+                    {images.map((image, index) => (
+                        <div
+                            key={index}
+                            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                                currentImageIndex === index ? 'opacity-100 z-10' : 'opacity-0'
+                            }`}
+                            style={{
+                                backgroundImage: `url(${image})`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                            }}
+                        ></div>
+                    ))}
                     {/* Lớp phủ để làm mờ */}
                     {/* <div className="absolute inset-0 bg-slate-400 opacity-30 z-10"></div> */}
                     {/* Search */}
@@ -352,10 +351,6 @@ function Home() {
                             <MdKeyboardDoubleArrowRight className="mt-1" />
                         </NavLink>
                     </div>
-
-                    <p className="text-center text-3xl text-white mb-8">
-                        Đặt khám nhanh - Lấy số thứ tự trực tuyến - Tư vấn sức khỏe từ xa
-                    </p>
                 </div>
 
                 {/* Dấu chấm điều hướng */}
