@@ -8,7 +8,7 @@ import { IoMdKey } from 'react-icons/io';
 import { axiosInstance } from '~/api/apiRequest';
 import avatar from '../../assets/img/avatar.png';
 function Header() {
-    const IMAGE_URL = 'http://localhost:8080/uploads';
+    const IMAGE_URL = 'http://localhost:9000/uploads';
 
     const { user, logout } = useContext(UserContext);
     const [isOpen, setIsOpen] = useState(false);

@@ -4,18 +4,25 @@ import { GrLocation } from 'react-icons/gr';
 import { LiaStethoscopeSolid } from 'react-icons/lia';
 import { CiHospital1 } from 'react-icons/ci';
 import { BsCoin } from 'react-icons/bs';
-import { NavLink } from 'react-router-dom';
+import { Icon } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { axiosClient } from '~/api/apiRequest';
 
 function Home() {
     const [facilities, setFacilities] = useState([]);
     const [doctors, setDoctors] = useState([]);
+    const navigate = useNavigate();
+
+    console.log('doctor', doctors);
     const images = [
         'https://i.pinimg.com/736x/8b/d9/44/8bd944a2576148952682eacd62970fc8.jpg',
         'https://i.pinimg.com/736x/af/c5/53/afc553e12c89eef85f87e9f9a34e02a0.jpg',
         'https://i.pinimg.com/736x/3a/26/8d/3a268ddc724585a07b1306e051641417.jpg',
         'https://i.pinimg.com/736x/36/c5/28/36c5286f8f150bf662214022935332c4.jpg',
     ];
+
+
+    const IMAGE_URL = 'http://localhost:9000/uploads/';
 
     const specialties = [
         {
@@ -117,11 +124,12 @@ function Home() {
         fetchClinics();
     }, []);
 
+    console.log('DOCTOR', doctors);
+
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
                 const response = await axiosClient.get('/doctor/dropdown');
-
                 if (response.errCode === 0) {
                     const formattedData = response.data.map((item) => ({
                         id: item.doctorInforId,
@@ -131,6 +139,7 @@ function Home() {
                         clinicName: item.clinicId.name,
                         price: item.price,
                         image: item.doctorId.image,
+                        userId: item.doctorId.userId,
                     }));
                     setDoctors(formattedData);
                 } else {
@@ -147,6 +156,7 @@ function Home() {
 
     //Slider
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentImageIndex((prevClinicIndex) => (prevClinicIndex + 1) % images.length);
@@ -188,6 +198,37 @@ function Home() {
         setcurrentIndexDoctor((prevDoctorIndex) =>
             prevDoctorIndex - 1 >= 0 ? prevDoctorIndex - 1 : doctors.length - itemsToShowDoctor,
         );
+    };
+
+    const handleGetClinic = (clinicId, nameClinic) => {
+        console.log('clinicId:', clinicId);
+        console.log('nameClinic:', nameClinic);
+        navigate(`/benh-vien?name=${nameClinic}`, {
+            state: {
+                clinicId,
+            },
+        });
+    };
+
+    const positions = ['P0', 'P1', 'P2']; // Mảng các giá trị cần so sánh
+
+    const getPositionLabel = (position) => {
+        if (position === 'P0') {
+            return 'Bác sĩ';
+        } else if (positions.includes(position)) {
+            return 'Chức danh khác'; // Thay thế bằng nhãn phù hợp cho các giá trị khác trong mảng
+        } else {
+            return position; // Giá trị mặc định nếu không khớp với bất kỳ giá trị nào trong mảng
+        }
+    };
+
+    const handleGetDoctor = (doctorId, doctorName) => {
+        console.log('doctorId:', doctorId);
+        navigate(`/bac-si/get?name=${doctorName}`, {
+            state: {
+                doctorId,
+            },
+        });
     };
 
     return (
@@ -256,8 +297,7 @@ function Home() {
                             {facilities
                                 .slice(currentIndexClinic, currentIndexClinic + itemsToShowClinic)
                                 .map((facility) => (
-                                    <NavLink
-                                        to="#"
+                                    <div
                                         key={facility.id}
                                         className="w-[296.5px] mx-[8px] bg-white rounded-lg shadow-md cursor-pointer"
                                     >
@@ -281,13 +321,16 @@ function Home() {
                                                         <GrLocation className="mt-1" />
                                                         <span>{facility.location}</span>
                                                     </div>
-                                                    <div className="w-full text-center bg-[#00B5F1] hover:bg-white border hover:border-[#00B5F1] hover:text-[#00B5F1] text-white font-bold py-3 px-4 rounded-xl">
+                                                    <div
+                                                        className="w-full text-center bg-[#00B5F1] hover:bg-white border hover:border-[#00B5F1] hover:text-[#00B5F1] text-white font-bold py-3 px-4 rounded-xl"
+                                                        onClick={() => handleGetClinic(facility.id, facility.name)}
+                                                    >
                                                         Đặt khám ngay
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </NavLink>
+                                    </div>
                                 ))}
                         </div>
                         <button
@@ -309,6 +352,22 @@ function Home() {
                             <MdKeyboardDoubleArrowRight className="mt-1" />
                         </NavLink>
                     </div>
+
+                    <p className="text-center text-3xl text-white mb-8">
+                        Đặt khám nhanh - Lấy số thứ tự trực tuyến - Tư vấn sức khỏe từ xa
+                    </p>
+                </div>
+
+                {/* Dấu chấm điều hướng */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                    {images.map((_, index) => (
+                        <div
+                            key={index}
+                            className={`w-3 h-3 rounded-full ${
+                                currentImageIndex === index ? 'bg-sky-500' : 'bg-white'
+                            }`}
+                        ></div>
+                    ))}
                 </div>
             </div>
 
@@ -318,8 +377,7 @@ function Home() {
                     <div className="relative max-w-screen-xl px-4">
                         <div className="flex">
                             {doctors.slice(currentIndexDoctor, currentIndexDoctor + itemsToShowDoctor).map((doctor) => (
-                                <NavLink
-                                    to="#"
+                                <div
                                     key={doctor.id}
                                     className="w-[296.5px] mx-[8px] bg-white rounded-lg shadow-md cursor-pointer"
                                 >
@@ -338,7 +396,7 @@ function Home() {
                                             <div className="flex flex-col justify-between gap-4 w-full text-[#003553]">
                                                 <div>
                                                     <h3 className="text-3xl font-normal text-left">
-                                                        {doctor.position}
+                                                        {getPositionLabel(doctor.position)}
                                                     </h3>
                                                     <h3 className="text-4xl font-semibold text-left truncate">
                                                         {doctor.fullname}
@@ -358,13 +416,16 @@ function Home() {
                                                         {doctor.clinicName}
                                                     </div>
                                                 </div>
-                                                <div className="w-full text-center bg-[#00B5F1] hover:bg-white border hover:border-[#00B5F1] hover:text-[#00B5F1] text-white font-bold py-3 px-4 rounded-xl">
+                                                <div
+                                                    className="w-full text-center bg-[#00B5F1] hover:bg-white border hover:border-[#00B5F1] hover:text-[#00B5F1] text-white font-bold py-3 px-4 rounded-xl"
+                                                    onClick={() => handleGetDoctor(doctor.userId, doctor.fullname)}
+                                                >
                                                     Đặt khám ngay
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </NavLink>
+                                </div>
                             ))}
                         </div>
                         <button
