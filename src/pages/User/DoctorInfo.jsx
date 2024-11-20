@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { MapPin, Clock, CreditCard, Shield } from 'lucide-react';
 import { axiosInstance } from '~/api/apiRequest';
-import { Await, useSearchParams, useNavigate } from 'react-router-dom'; // Dùng để lấy `patientRecordId` từ URL
+import { Await, useSearchParams, useNavigate, useLocation } from 'react-router-dom'; // Dùng để lấy `patientRecordId` từ URL
 import parse from 'html-react-parser';
 import './CSS/DoctorDescription.css';
 
@@ -10,9 +10,11 @@ function DoctorInfo() {
     const [currentDate, setCurrentDate] = useState('');
     const [schedule, setSchedule] = useState([]);
     const [doctorInfo, setDoctorInfo] = useState([]);
+    const { state } = useLocation();
+    console.log('STATE', state);
 
     const [searchParams] = useSearchParams();
-    const doctorId = searchParams.get('id');
+    const doctorId = searchParams.get('id') || state.doctorId;
     const navigate = useNavigate();
 
     // console.log('Doctor info: ', doctorInfo);
@@ -142,7 +144,7 @@ function DoctorInfo() {
             {/* Schedule Section */}
             <div className="grid md:grid-cols-3 gap-6">
                 <div className="md:col-span-2">
-                    <div className="border rounded-lg p-4 h-[196px]">
+                    <div className="border rounded-lg p-4 h-fit">
                         <div className="flex items-center gap-2 mb-4">
                             <Clock className="w-5 h-5 text-blue-500" />
                             <h2 className="font-semibold text-3xl">LỊCH KHÁM</h2>

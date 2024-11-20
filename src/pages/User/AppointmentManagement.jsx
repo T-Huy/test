@@ -13,6 +13,8 @@ const AppointmentManagement = () => {
     const { user } = useContext(UserContext);
 
     const tabs = [
+        // chưa thanh toán
+        { id: 'unpaid', label: 'Chưa thanh toán', keyMap: 'S1' },
         { id: 'paid', label: 'Đã thanh toán', keyMap: 'S2' },
         { id: 'examined', label: 'Đã khám', keyMap: 'S3' },
         { id: 'cancelled', label: 'Đã hủy', keyMap: 'S4' },
