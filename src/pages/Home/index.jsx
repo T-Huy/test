@@ -123,8 +123,6 @@ function Home() {
         fetchClinics();
     }, []);
 
-    console.log('DOCTOR', doctors);
-
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
@@ -252,22 +250,20 @@ function Home() {
                     {/* <div className="absolute inset-0 bg-slate-400 opacity-30 z-10"></div> */}
                     {/* Search */}
                     <div className="absolute left-0 right-0 top-52 z-20 max-w-5xl mx-auto ">
-                        <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
+                        <h1 className="text-3xl md:text-4xl font-bold text-blue-500 text-center mb-4">
                             Nền tảng công nghệ
                         </h1>
                         <h2 className="text-4xl md:text-5xl font-bold text-slate-900 text-center mb-8">
                             Kết nối người dân với Cơ sở - Dịch vụ Y tế
                         </h2>
-
-                        <div className="relative mb-8">
+                        {/* <div className="relative mb-8">
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm..."
                                 className="w-full h-16 pl-8 px-4 pr-12 rounded-full shadow-lg text-2xl outline-none border border-transparent focus:border-neutral-600"
                             />
                             <MdSearch className="cursor-pointer absolute right-8 top-1/2 text-4xl transform -translate-y-1/2 text-gray-400" />
-                        </div>
-
+                        </div> */}
                         <p className="text-center text-3xl text-white mb-8">
                             Đặt khám nhanh - Lấy số thứ tự trực tuyến - Tư vấn sức khỏe từ xa
                         </p>
@@ -351,18 +347,6 @@ function Home() {
                             <MdKeyboardDoubleArrowRight className="mt-1" />
                         </NavLink>
                     </div>
-                </div>
-
-                {/* Dấu chấm điều hướng */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                    {images.map((_, index) => (
-                        <div
-                            key={index}
-                            className={`w-3 h-3 rounded-full ${
-                                currentImageIndex === index ? 'bg-sky-500' : 'bg-white'
-                            }`}
-                        ></div>
-                    ))}
                 </div>
             </div>
 
