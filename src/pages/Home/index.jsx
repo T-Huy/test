@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import BackGround from '../../assets/img/background.png';
+import React, { useEffect, useRef, useState } from 'react';
 import { MdChevronLeft, MdChevronRight, MdKeyboardDoubleArrowRight, MdSearch } from 'react-icons/md';
 import { GrLocation } from 'react-icons/gr';
 import { LiaStethoscopeSolid } from 'react-icons/lia';
 import { CiHospital1 } from 'react-icons/ci';
 import { BsCoin } from 'react-icons/bs';
-import { Icon } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { axiosClient } from '~/api/apiRequest';
 
@@ -18,136 +16,6 @@ function Home() {
         'https://i.pinimg.com/736x/3a/26/8d/3a268ddc724585a07b1306e051641417.jpg',
         'https://i.pinimg.com/736x/36/c5/28/36c5286f8f150bf662214022935332c4.jpg',
     ];
-
-    // const facilities = [
-    //     {
-    //         id: 1,
-    //         name: 'Bệnh Viện Quận Bình Thạnh Bệnh Viện Quận Bình Thạnh',
-    //         location: '786 Nguyễn Kiệm',
-    //         rating: 4.5,
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fbinhthanhhcm%2Fweb%2Flogo.png%3Ft%3DTue%2520Sep%252013%25202022%252010%3A08%3A08%2520GMT%2B0700%2520(Indochina%2520Time)&w=256&q=75',
-    //     },
-    //     {
-    //         id: 2,
-    //         name: 'Bệnh Viện Quận Bình Thạnh',
-    //         location: '786 Nguyễn Kiệm, P.3, Q. Gò Vấp, TP.HCM',
-    //         rating: 4.6,
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fbvmathcm%2Fweb%2Flogo.png%3Ft%3D11&w=256&q=75',
-    //     },
-    //     {
-    //         id: 3,
-    //         name: 'Bệnh Viện Quận Bình Thạnh',
-    //         location: '786 Nguyễn Kiệm, P.3, Q. Gò Vấp, TP.HCM',
-    //         rating: 4.3,
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn.medpro.vn%2Fprod-partner%2F28da7b66-3643-4224-906e-4330491c2f44-310988115_501122428699790_1399222391851240979_n.jpg&w=256&q=75',
-    //     },
-    //     {
-    //         id: 4,
-    //         name: 'Bệnh Viện Quận Bình Thạnh',
-    //         location: '786 Nguyễn Kiệm, P.3, Q. Gò Vấp, TP.HCM',
-    //         rating: 4.8,
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fprod-partner%2F6e45965e-09bd-4a35-b396-5df82f3e443e-logo_sgh_512x512_(2).png&w=256&q=75g',
-    //     },
-    //     {
-    //         id: 5,
-    //         name: 'Bệnh Viện Quận Bình Thạnh',
-    //         location: '786 Nguyễn Kiệm, P.3, Q. Gò Vấp, TP.HCM',
-    //         rating: 4.7,
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fchoray%2Fweb%2Flogo.png%3Ft%3D22222222&w=256&q=75',
-    //     },
-    //     {
-    //         id: 6,
-    //         name: 'Bệnh Viện Quận Bình Thạnh',
-    //         location: '786 Nguyễn Kiệm, P.3, Q. Gò Vấp, TP.HCM',
-    //         rating: 4.4,
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fctchhcm%2Fweb%2Flogo.png%3F1657159777132%3Ft%3D123&w=256&q=75',
-    //     },
-    //     {
-    //         id: 7,
-    //         name: 'Bệnh Viện Quận Bình Thạnh',
-    //         location: '786 Nguyễn Kiệm, P.3, Q. Gò Vấp, TP.HCM',
-    //         rating: 4.2,
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fdalieuhcm%2Fapp%2Fimage%2Flogo_circle.png%3Ft%3D123&w=256&q=75',
-    //     },
-    //     {
-    //         id: 8,
-    //         name: 'Bệnh Viện Quận Bình Thạnh',
-    //         location: '786 Nguyễn Kiệm, P.3, Q. Gò Vấp, TP.HCM',
-    //         rating: 4.9,
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fdkdongnai%2Fweb%2Flogo.png%3Ft%3D22&w=256&q=75',
-    //     },
-    //     {
-    //         id: 9,
-    //         name: 'Bệnh Viện Quận Bình Thạnh',
-    //         location: '786 Nguyễn Kiệm, P.3, Q. Gò Vấp, TP.HCM',
-    //         rating: 4.1,
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fhoanmytd%2Fapp%2Fimage%2Flogo_circle.png%3Ft%3D8888888&w=256&q=75',
-    //     },
-    //     {
-    //         id: 10,
-    //         name: 'Bệnh Viện Quận Bình Thạnh',
-    //         location: '786 Nguyễn Kiệm, P.3, Q. Gò Vấp, TP.HCM',
-    //         rating: 4.0,
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fleloi%2Fapp%2Fimage%2Flogo_circle.png%3Ft%3D1111111&w=256&q=75',
-    //     },
-    // ];
-
-    // const doctors = [
-    //     {
-    //         id: 1,
-    //         position: 'BS CKI',
-    //         fullname: 'Lê Tấn Huy',
-    //         specialtyName: 'Thần Kinh',
-    //         clinicName: 'Bệnh Viện Quận Bình Thạnh',
-    //         price: '300000',
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fbinhthanhhcm%2Fweb%2Flogo.png%3Ft%3DTue%2520Sep%252013%25202022%252010%3A08%3A08%2520GMT%2B0700%2520(Indochina%2520Time)&w=256&q=75',
-    //     },
-    //     {
-    //         id: 2,
-    //         position: 'BS CKI',
-    //         fullname: 'Lê Tấn Huy',
-    //         specialtyName: 'Thần Kinh',
-    //         clinicName: 'Bệnh Viện Quận Bình Thạnh',
-    //         price: '300000',
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fbinhthanhhcm%2Fweb%2Flogo.png%3Ft%3DTue%2520Sep%252013%25202022%252010%3A08%3A08%2520GMT%2B0700%2520(Indochina%2520Time)&w=256&q=75',
-    //     },
-    //     {
-    //         id: 3,
-    //         position: 'BS CKI',
-    //         fullname: 'Lê Tấn Huy',
-    //         specialtyName: 'Thần Kinh',
-    //         clinicName: 'Bệnh Viện Quận Bình Thạnh',
-    //         price: '300000',
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fbinhthanhhcm%2Fweb%2Flogo.png%3Ft%3DTue%2520Sep%252013%25202022%252010%3A08%3A08%2520GMT%2B0700%2520(Indochina%2520Time)&w=256&q=75',
-    //     },
-    //     {
-    //         id: 4,
-    //         position: 'BS CKI',
-    //         fullname: 'Lê Tấn Huy',
-    //         specialtyName: 'Thần Kinh',
-    //         clinicName: 'Bệnh Viện Quận Bình Thạnh',
-    //         price: '300000',
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fbinhthanhhcm%2Fweb%2Flogo.png%3Ft%3DTue%2520Sep%252013%25202022%252010%3A08%3A08%2520GMT%2B0700%2520(Indochina%2520Time)&w=256&q=75',
-    //     },
-    //     {
-    //         id: 5,
-    //         position: 'BS CKI',
-    //         fullname: 'Lê Tấn Huy',
-    //         specialtyName: 'Thần Kinh',
-    //         clinicName: 'Bệnh Viện Quận Bình Thạnh',
-    //         price: '300000',
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fbinhthanhhcm%2Fweb%2Flogo.png%3Ft%3DTue%2520Sep%252013%25202022%252010%3A08%3A08%2520GMT%2B0700%2520(Indochina%2520Time)&w=256&q=75',
-    //     },
-    //     {
-    //         id: 6,
-    //         position: 'BS CKI',
-    //         fullname: 'Lê Tấn Huy',
-    //         specialtyName: 'Thần Kinh',
-    //         clinicName: 'Bệnh Viện Quận Bình Thạnh',
-    //         price: '300000',
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fbinhthanhhcm%2Fweb%2Flogo.png%3Ft%3DTue%2520Sep%252013%25202022%252010%3A08%3A08%2520GMT%2B0700%2520(Indochina%2520Time)&w=256&q=75',
-    //     },
-    // ];
 
     const specialties = [
         {
@@ -223,13 +91,6 @@ function Home() {
             name: 'Y Học Cổ Truyền',
         },
     ];
-    // {
-    //     id: 1,
-    //     name: 'Bệnh Viện Quận Bình Thạnh Bệnh Viện Quận Bình Thạnh',
-    //     location: '786 Nguyễn Kiệm',
-    //     rating: 4.5,
-    //     image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fbo-api.medpro.com.vn%3A5000%2Fstatic%2Fimages%2Fbinhthanhhcm%2Fweb%2Flogo.png%3Ft%3DTue%2520Sep%252013%25202022%252010%3A08%3A08%2520GMT%2B0700%2520(Indochina%2520Time)&w=256&q=75',
-    // },
 
     useEffect(() => {
         const fetchClinics = async () => {
@@ -259,7 +120,7 @@ function Home() {
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
-                const response = await axiosClient.get('/doctor');
+                const response = await axiosClient.get('/doctor/dropdown');
 
                 if (response.errCode === 0) {
                     const formattedData = response.data.map((item) => ({
@@ -292,6 +153,10 @@ function Home() {
         }, 4000); // Chuyển ảnh mỗi 4 giây
         return () => clearInterval(interval);
     }, [images.length]);
+
+    const handleChangeImage = (index) => {
+        setCurrentImageIndex(index);
+    };
 
     //Bac Si
     const [currentIndexClinic, setcurrentIndexClinic] = useState(0);
@@ -330,20 +195,19 @@ function Home() {
             <div>
                 <div className="h-[500px] bg-sky-100 relative overflow-hidden mt-20">
                     {/* Background image */}
-                    <div className="relative w-full h-full overflow-hidden">
-                        <div
-                            className="flex transition-transform duration-1000 bg-opacity-5 z-0"
-                            style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}
-                        >
-                            {images.map((image, index) => (
-                                <div
-                                    key={index}
-                                    className="min-w-full h-[500px] bg-cover bg-center"
-                                    style={{ backgroundImage: `url(${image})` }}
-                                ></div>
-                            ))}
-                        </div>
-                    </div>
+                        {images.map((image, index) => (
+                            <div
+                                key={index}
+                                className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                                    currentImageIndex === index ? 'opacity-100 z-10' : 'opacity-0'
+                                }`}
+                                style={{
+                                    backgroundImage: `url(${image})`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                }}
+                            ></div>
+                        ))}
                     {/* Lớp phủ để làm mờ */}
                     {/* <div className="absolute inset-0 bg-slate-400 opacity-30 z-10"></div> */}
                     {/* Search */}
@@ -370,11 +234,12 @@ function Home() {
                     </div>
 
                     {/* Dấu chấm điều hướng */}
-                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
                         {images.map((_, index) => (
                             <div
                                 key={index}
-                                className={`w-3 h-3 rounded-full ${
+                                onClick={() => handleChangeImage(index)}
+                                className={`w-3 h-3 rounded-full cursor-pointer ${
                                     currentImageIndex === index ? 'bg-sky-500' : 'bg-white'
                                 }`}
                             ></div>
@@ -400,9 +265,9 @@ function Home() {
                                             <div className="flex flex-col items-center gap-4">
                                                 <div className="flex justify-center items-center h-[160px] w-[160px] rounded-full overflow-hidden">
                                                     <img
-                                                        src={`http://localhost:${import.meta.env.VITE_BE_PORT}/uploads/${
-                                                            facility.image
-                                                        }`}
+                                                        src={`http://localhost:${
+                                                            import.meta.env.VITE_BE_PORT
+                                                        }/uploads/${facility.image}`}
                                                         alt={facility.name}
                                                         className="object-cover w-full h-full"
                                                     />
@@ -462,7 +327,9 @@ function Home() {
                                         <div className="flex flex-col items-center gap-4">
                                             <div className="flex justify-center items-center h-[160px] w-[160px] rounded-full overflow-hidden">
                                                 <img
-                                                    src={doctor.image}
+                                                    src={`http://localhost:${import.meta.env.VITE_BE_PORT}/uploads/${
+                                                        doctor.image
+                                                    }`}
                                                     alt={doctor.name}
                                                     className="object-cover w-full h-full"
                                                 />

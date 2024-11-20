@@ -1,10 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import loginImg from '../../assets/img/avatar.png';
-import { faFacebook, faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useContext } from 'react';
 import { UserContext } from '../../context/UserContext';
@@ -16,6 +13,14 @@ function Login() {
     const [password, setPassword] = useState('');
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
+    const inputFocus = useRef(null);
+
+    useEffect(() => {
+        if (inputFocus.current) {
+            inputFocus.current.focus();
+        }
+    }, []);
+
     const navigate = useNavigate();
 
     const { loginContext } = useContext(UserContext);
@@ -29,28 +34,33 @@ function Login() {
         setEmailError('');
     };
 
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value);
-        setPasswordError('');
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleEmailBlur = () => {
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!email) {
             setEmailError('Email không được để trống.');
         } else if (!emailPattern.test(email)) {
             setEmailError('Email không đúng định dạng.');
         }
+    };
+
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+        setPasswordError('');
+    };
+
+    const handlePasswordBlur = () => {
         if (!password) {
-            setPasswordError('Mật khẩu không được để trống.');
+            setPasswordError('Password không được để trống.');
         }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
             const res = await axiosClient.post(`/sign-in`, {
                 email,
                 password,
             });
-            console.log(res);
 
             if (res.status === 'OK') {
                 loginContext(email, res.access_token);
@@ -65,45 +75,49 @@ function Login() {
                     navigate('/');
                 }
             } else {
-                console.log('why 1');
-
                 toast.error('Đăng nhập thất bại');
             }
         } catch (error) {
-            console.log('why 2');
-            console.error(error);
             toast.error('Đăng nhập thất bại');
         }
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSubmit(e);
+        }
+    };
+
     return (
-        <div className="flex justify-center items-center min-h-[50vh] h-[600px] bg-white shadow-md rounded-md w-[calc(100%-540px)] max-w-[1200px] mx-auto overflow-hidden">
-            <div className="flex-1">
-                <img className="w-full h-auto" src={loginImg} alt="loginImage" />
-            </div>
-            <div className="flex-1">
-                <div className="p-12">
-                    <div className="mb-6">
-                        <h3 className="text-2xl font-normal text-gray-800">Đăng nhập</h3>
+        <div className="flex items-center justify-center min-h-screen bg-[#e9ebee]">
+            <div className="w-full max-w-xl p-8 bg-white shadow-xl border rounded-2xl">
+                <div className="mb-6">
+                    <h3 className="text-4xl font-bold text-gray-800 text-center">Đăng nhập</h3>
+                </div>
+                <div>
+                    <div className="mb-4">
+                        <input
+                            ref={inputFocus}
+                            type="text"
+                            className="w-full !bg-white h-[44px] mt-4 px-3 py-2  border border-gray-300 rounded-xl"
+                            placeholder="Email"
+                            value={email}
+                            onChange={handleEmailChange}
+                            onBlur={handleEmailBlur}
+                            onKeyDown={handleKeyDown}
+                        />
+                        {emailError && <span className="text-red-500 mt-1 text-xl">{emailError}</span>}
                     </div>
-                    <div>
-                        <div className="mb-4">
-                            <input
-                                type="text"
-                                className="w-full h-[40px] mt-4 px-3 py-2  border border-gray-500 rounded-lg "
-                                placeholder="Email của bạn"
-                                value={email}
-                                onChange={handleEmailChange}
-                            />
-                            {emailError && <span className="text-red-500  mt-1">{emailError}</span>}
-                        </div>
-                        <div className="mb-4 relative">
+                    <div className="mb-4 relative">
+                        <div className="relative">
                             <input
                                 type={showPassword ? 'text' : 'password'}
-                                className="w-full h-[40px] mt-4 px-3 py-2 border border-gray-500 rounded-lg "
-                                placeholder="Mật khẩu của bạn"
+                                className="w-full !bg-white h-[44px] mt-4 pl-3 pr-12 py-2 border  border-gray-300 rounded-xl"
+                                placeholder="Mật khẩu"
                                 value={password}
                                 onChange={handlePasswordChange}
+                                onBlur={handlePasswordBlur}
+                                onKeyDown={handleKeyDown}
                             />
                             <button
                                 type="button"
@@ -112,38 +126,28 @@ function Login() {
                             >
                                 <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                             </button>
-                            {passwordError && <span className="text-red-500 mt-1">{passwordError}</span>}
                         </div>
-                        <div className="text-right mb-4">
-                            <a href="#" className="text-blue-500">
-                                Quên mật khẩu
-                            </a>
-                        </div>
-                        <div>
-                            <button
-                                className="w-full mt-3 text-white bg-blue-500 py-3 px-6 rounded hover:bg-blue-600"
-                                onClick={handleSubmit}
-                            >
-                                Đăng nhập
-                            </button>
-                        </div>
-                        <span className="flex items-center m-8">
-                            <span className="h-px flex-1 bg-black"></span>
-                            <span className="shrink-0 px-6">Hoặc</span>
-                            <span className="h-px flex-1 bg-black"></span>
-                        </span>
-                        <div className="flex justify-center items-center mt-5 bg-white px-9 py-2 border border-gray-300 cursor-pointer">
-                            <a href="#" className="flex items-center text-gray-500">
-                                <FontAwesomeIcon icon={faGoogle} className="text-lg" />
-                                <span className="ml-3">Đăng nhập với Google</span>
-                            </a>
-                        </div>
-                        <div className="text-center mt-3">
-                            <span className="text-gray-500">Don't have an account?</span>
-                            <a href="#" className="text-blue-500 ml-3 underline">
-                                Sign up
-                            </a>
-                        </div>
+                        {passwordError && <span className="text-red-500 mt-1 text-xl">{passwordError}</span>}
+                    </div>
+                    <div className="text-right my-6 text-xl ">
+                        <NavLink to="/forgot-password" className="text-blue-500 text-2xl">
+                            Quên mật khẩu?
+                        </NavLink>
+                    </div>
+                    <div>
+                        <button
+                            type="button"
+                            className="w-full text-white font-semibold bg-blue-500 py-3 px-6 rounded-lg hover:bg-blue-600"
+                            onClick={handleSubmit}
+                        >
+                            Đăng nhập
+                        </button>
+                    </div>
+                    <div className="text-center mt-6">
+                        <span className="text-gray-500">Bạn chưa có tài khoản?</span>
+                        <NavLink to="/register" className="text-blue-500 ml-1 font-medium">
+                            Đăng kí
+                        </NavLink>
                     </div>
                 </div>
             </div>
