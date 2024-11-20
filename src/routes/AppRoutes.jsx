@@ -12,6 +12,8 @@ import UserProfile from '~/pages/User/UserProfile';
 import PatientRecords from '~/pages/User/PatientRecords';
 import AppointmentManagement from '~/pages/User/AppointmentManagement';
 import UserRoutes from './UserRoutes';
+import ForgotPassword from '~/pages/ForgotPassword';
+import ConfirmOTP from '~/pages/ConfirmOTP';
 
 function AppRoutes() {
     return (
@@ -20,7 +22,9 @@ function AppRoutes() {
                 <Route path="/" element={<HomeLayout />}>
                     <Route index element={<Home />} />
                     <Route path="/login" element={<Login />} />
+                    <Route path="/forgot-password" element={<ForgotPassword/>}/>
                     <Route path="/register" element={<Register />} />
+                    <Route path="/confirm-otp" element={<ConfirmOTP/>}/>
                     <Route path="/bac-si" element={<DoctorInfo />} />
                     {/* <Route path="/user" element={<UserDashboard />} /> */}
                     {/* <Route path="/user/profile" element={<UserProfile />} />
