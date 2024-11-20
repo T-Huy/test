@@ -11,13 +11,18 @@ const UserManagement = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  const { logout } = useContext(UserContext);
+  const { logout, user } = useContext(UserContext);
   const [selectedFile, setSelectedFile] = useState({});
   const [previewImage, setPreviewImage] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
   const [filterValue, setFilterValue] = useState('');
   const [pagination, setPagination] = useState({ page: 1, limit: 6, totalPages: 1 });
   const [users, setUsers] = useState([]);
+  const [avata, setAvata] = useState('');
+
+  useEffect(() => {
+    getAvataAccount(user.userId);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,7 +31,7 @@ const UserManagement = () => {
     fetchData();
   }, [pagination, filterValue]);
 
-  const [user, setUser] = useState({
+  const [addUser, setUser] = useState({
     userId: "",
     fullname: "",
     email: "",
@@ -55,6 +60,21 @@ const UserManagement = () => {
   const [deleteUser, setDeleteUser] = useState({
     userId: ''
   })
+
+  const getAvataAccount = async (userId) => {
+    try {
+      const response = await axiosInstance.get(`/user/${userId}`);
+
+      if (response.status === "OK") {
+        // Xử lý khi thành công
+        setAvata(response.data.image)
+      } else {
+        console.error('Failed to update schedule:', response.message);
+      }
+    } catch (error) {
+      console.error('Error update schedule:', error);
+    }
+  };
 
   const createUserAPI = async (formData) => {
     try {
@@ -136,7 +156,7 @@ const UserManagement = () => {
       if (response.status === 'OK') {
         //console.log('Fetched users:', response.data.data);
         setUsers(response.data);
-        if(response.totalPages === 0){
+        if (response.totalPages === 0) {
           response.totalPages = 1
         }
         if (pagination.totalPages !== response.totalPages) {
@@ -232,12 +252,12 @@ const UserManagement = () => {
   const handleCloseUpdateModal = () => {
     setValidationErrors({});
     setIsUpdateModalOpen(false);
-    setPreviewImage({image: ""})
+    setPreviewImage({ image: "" })
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser({ ...user, [name]: value });
+    setUser({ ...addUser, [name]: value });
     setValidationErrors({ ...validationErrors, [name]: '' });
   };
 
@@ -254,7 +274,7 @@ const UserManagement = () => {
     const file = e.target.files[0];
     if (file) {
       const objectURL = URL.createObjectURL(file);
-      setUser({ ...user, image: objectURL }); // Lưu blob URL
+      setUser({ ...addUser, image: objectURL }); // Lưu blob URL
       // Xóa lỗi nếu có hình ảnh
       setValidationErrors((prevErrors) => ({
         ...prevErrors,
@@ -277,15 +297,15 @@ const UserManagement = () => {
 
   const handleAddUser = () => {
     const errors = {};
-    if (!user.fullname) errors.fullname = "Tên người dùng không được để trống.";
-    if (!user.email) errors.email = "Email không được để trống.";
-    if (!user.image) errors.image = "Hình ảnh không được để trống.";
-    if (!user.address) errors.address = "Địa chỉ không được để trống.";
-    if (!user.birthDate) errors.birthDate = "Ngày sinh không được để trống.";
-    if (!user.phoneNumber) errors.phoneNumber = "Số điện thoại không được để trống.";
-    if (!user.password) errors.password = "Mật khẩu không được để trống.";
-    if (!user.roleId) errors.roleId = "Vai trò không được để trống.";
-    if (!user.gender) errors.gender = "Giới tính không được để trống.";
+    if (!addUser.fullname) errors.fullname = "Tên người dùng không được để trống.";
+    if (!addUser.email) errors.email = "Email không được để trống.";
+    if (!addUser.image) errors.image = "Hình ảnh không được để trống.";
+    if (!addUser.address) errors.address = "Địa chỉ không được để trống.";
+    if (!addUser.birthDate) errors.birthDate = "Ngày sinh không được để trống.";
+    if (!addUser.phoneNumber) errors.phoneNumber = "Số điện thoại không được để trống.";
+    if (!addUser.password) errors.password = "Mật khẩu không được để trống.";
+    if (!addUser.roleId) errors.roleId = "Vai trò không được để trống.";
+    if (!addUser.gender) errors.gender = "Giới tính không được để trống.";
 
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors); // Cập nhật lỗi
@@ -293,8 +313,8 @@ const UserManagement = () => {
     }
     const formData = new FormData();
     // Thêm các trường từ user vào FormData
-    Object.keys(user).forEach((key) => {
-      formData.append(key, user[key]);
+    Object.keys(addUser).forEach((key) => {
+      formData.append(key, addUser[key]);
     });
 
     // Thêm file (nếu có)
@@ -305,7 +325,7 @@ const UserManagement = () => {
     alert("Thêm tài khoản thành công!");
     setValidationErrors(errors);
     setSelectedFile(null)
-    console.log("New User Info:", user);
+    console.log("New User Info:", addUser);
     handleCloseModal();
   };
 
@@ -392,7 +412,7 @@ const UserManagement = () => {
 
   // Dữ liệu các mục menu
   const menuItems = [
-    { path: "/admin/dashboard", label: "Bảng thống kê", icon: <FontAwesomeIcon icon={faGauge} /> },
+    //{ path: "/admin/dashboard", label: "Bảng thống kê", icon: <FontAwesomeIcon icon={faGauge} /> },
     { path: "/admin/clinic", label: "Quản lý bệnh viện", icon: <FontAwesomeIcon icon={faHospital} /> },
     { path: "/admin/doctor", label: "Quản lý bác sĩ", icon: "👩‍⚕️" },
     { path: "/admin/user", label: "Quản lý tài khoản người dùng", icon: "👤" },
@@ -458,7 +478,7 @@ const UserManagement = () => {
                 <span className="font-bold">Admin</span>
                 <div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
                   <img
-                    src={"https://s3.ap-southeast-1.amazonaws.com/cdn.vntre.vn/default/meme-meo-khoc-5-1725388333.jpg" || "https://via.placeholder.com/150"}
+                    src={avata ? `http://localhost:9000/uploads/${avata}` : 'http://localhost:3000/src/assets/img/avatar.png'}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
@@ -476,9 +496,9 @@ const UserManagement = () => {
                   }}
                 >
                   <ul className="py-2">
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                       Hồ sơ cá nhân
-                    </li>
+                    </li> */}
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>
                       Đăng xuất
                     </li>
@@ -608,7 +628,7 @@ const UserManagement = () => {
                       <input
                         type="email"
                         name="email"
-                        value={user.email}
+                        value={addUser.email}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         className={`border w-full px-2 py-1 rounded ${validationErrors.email ? "border-red-500" : "border-gray-400"
@@ -624,7 +644,7 @@ const UserManagement = () => {
                         <input
                           type={showPassword ? "text" : "password"} // Thay đổi type dựa trên showPassword
                           name="password"
-                          value={user.password}
+                          value={addUser.password}
                           onChange={handleChange}
                           onBlur={handleBlur}
                           className={`border w-full px-2 py-1 rounded ${validationErrors.password ? "border-red-500" : "border-gray-400"}`}
@@ -650,7 +670,7 @@ const UserManagement = () => {
                         onClick={() => imageInputRef.current.click()}
                       >
                         <img
-                          src={user.image}
+                          src={addUser.image}
                           alt="No Image"
                           className="w-full h-full object-cover"
                         />
@@ -672,7 +692,7 @@ const UserManagement = () => {
                     <input
                       type="text"
                       name="fullname"
-                      value={user.fullname}
+                      value={addUser.fullname}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className={`border w-full px-2 py-1 rounded ${validationErrors.fullname ? "border-red-500" : "border-gray-400"
@@ -687,7 +707,7 @@ const UserManagement = () => {
                     <input
                       type="text"
                       name="phoneNumber"
-                      value={user.phoneNumber}
+                      value={addUser.phoneNumber}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className={`border w-full px-2 py-1 rounded ${validationErrors.phoneNumber ? "border-red-500" : "border-gray-400"
@@ -702,7 +722,7 @@ const UserManagement = () => {
                     <input
                       type="date"
                       name="birthDate"
-                      value={user.birthDate}
+                      value={addUser.birthDate}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className={`border w-full px-2 py-1 rounded ${validationErrors.birthDate ? "border-red-500" : "border-gray-400"
@@ -717,7 +737,7 @@ const UserManagement = () => {
                     <input
                       type="text"
                       name="address"
-                      value={user.address}
+                      value={addUser.address}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className={`border w-full px-2 py-1 rounded ${validationErrors.address ? "border-red-500" : "border-gray-400"
@@ -732,7 +752,7 @@ const UserManagement = () => {
                     <select
                       type="text"
                       name="gender"
-                      value={user.gender}
+                      value={addUser.gender}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className={`border w-full px-2 py-1 rounded ${validationErrors.gender ? "border-red-500" : "border-gray-400"
@@ -752,7 +772,7 @@ const UserManagement = () => {
                     <select
                       type="text"
                       name="roleId"
-                      value={user.roleId}
+                      value={addUser.roleId}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className={`border w-full px-2 py-1 rounded ${validationErrors.roleId ? "border-red-500" : "border-gray-400"

@@ -10,13 +10,19 @@ const SpecialtyManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  const { logout } = useContext(UserContext);
+  const { logout, user } = useContext(UserContext);
   const [selectedFile, setSelectedFile] = useState({});
   const [previewImage, setPreviewImage] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
   const [filterValue, setFilterValue] = useState('');
   const [pagination, setPagination] = useState({ page: 1, limit: 6, totalPages: 1 });
   const [specialties, setSpecialties] = useState([]);
+  const [avata, setAvata] = useState('');
+
+  useEffect(() => {
+    getAvataAccount(user.userId);
+  }, []);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,6 +48,21 @@ const SpecialtyManagement = () => {
   const [deleteSpecialty, setDeleteSpecialty] = useState({
     specialtyId: ""
   })
+
+  const getAvataAccount = async (userId) => {
+    try {
+      const response = await axiosInstance.get(`/user/${userId}`);
+
+      if (response.status === "OK") {
+        // Xử lý khi thành công
+        setAvata(response.data.image)
+      } else {
+        console.error('Failed to update schedule:', response.message);
+      }
+    } catch (error) {
+      console.error('Error update schedule:', error);
+    }
+  };
 
   const createSpecialtyAPI = async (formData) => {
     try {
@@ -347,7 +368,7 @@ const SpecialtyManagement = () => {
 
   // Dữ liệu các mục menu
   const menuItems = [
-    { path: "/admin/dashboard", label: "Bảng thống kê", icon: <FontAwesomeIcon icon={faGauge} /> },
+    //{ path: "/admin/dashboard", label: "Bảng thống kê", icon: <FontAwesomeIcon icon={faGauge} /> },
     { path: "/admin/clinic", label: "Quản lý bệnh viện", icon: <FontAwesomeIcon icon={faHospital} /> },
     { path: "/admin/doctor", label: "Quản lý bác sĩ", icon: "👩‍⚕️" },
     { path: "/admin/user", label: "Quản lý tài khoản người dùng", icon: "👤" },
@@ -413,8 +434,7 @@ const SpecialtyManagement = () => {
                 <span className="font-bold">Admin</span>
                 <div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
                   <img
-                    src={"https://s3.ap-southeast-1.amazonaws.com/cdn.vntre.vn/default/meme-meo-khoc-5-1725388333.jpg" || "https://via.placeholder.com/150"}
-                    alt="Profile"
+                    src={avata ? `http://localhost:9000/uploads/${avata}` : 'http://localhost:3000/src/assets/img/avatar.png'}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -431,9 +451,9 @@ const SpecialtyManagement = () => {
                   }}
                 >
                   <ul className="py-2">
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                       Hồ sơ cá nhân
-                    </li>
+                    </li> */}
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>
                       Đăng xuất
                     </li>
