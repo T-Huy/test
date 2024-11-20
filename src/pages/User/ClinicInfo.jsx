@@ -36,7 +36,7 @@ function ClinicInfo() {
         });
     };
     return (
-        <div className="min-h-screen bg-gray-50 mt-20">
+        <div className="min-h-screen bg-white mt-20">
             {/* Header */}
             <header className="bg-white shadow-sm h-[300px] relative px-4 sm:px-7">
                 <img

@@ -140,7 +140,7 @@ function ConfirmInfomation() {
         setPaymentMethod(event.target.value);
     };
     return (
-        <div className="max-w-fit mx-auto p-4 space-y-4 mt-32">
+        <div className="max-w-fit mx-auto p-4 space-y-4 mt-32 mb-20">
             <h1 className="text-5xl font-bold text-blue-600 mb-2 text-center">Xác nhận thông tin</h1>
             {/* Hospital Information */}
             <div className="bg-white rounded-lg shadow-md">
