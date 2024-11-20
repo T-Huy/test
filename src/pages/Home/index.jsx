@@ -23,10 +23,7 @@ function Home() {
         'https://i.pinimg.com/736x/36/c5/28/36c5286f8f150bf662214022935332c4.jpg',
     ];
 
-
     // console.log('facilities:', facilities);
-
-=======
     // const facilities = [
     //     {
     //         id: 1,
@@ -326,7 +323,7 @@ function Home() {
     }, []);
 
     //Slider
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentImageIndex((prevClinicIndex) => (prevClinicIndex + 1) % images.length);
@@ -365,7 +362,6 @@ function Home() {
             prevDoctorIndex - 1 >= 0 ? prevDoctorIndex - 1 : doctors.length - itemsToShowDoctor,
         );
     };
-
 
     const handleGetClinic = (clinicId, nameClinic) => {
         console.log('clinicId:', clinicId);
@@ -482,9 +478,7 @@ function Home() {
                             {facilities
                                 .slice(currentIndexClinic, currentIndexClinic + itemsToShowClinic)
                                 .map((facility) => (
-
                                     <div
-
                                         key={facility.id}
                                         className="w-[296.5px] mx-[8px] bg-white rounded-lg shadow-md cursor-pointer"
                                     >
@@ -518,7 +512,6 @@ function Home() {
                                             </div>
                                         </div>
                                     </div>
-
                                 ))}
                         </div>
                         <button
@@ -540,7 +533,6 @@ function Home() {
                             <MdKeyboardDoubleArrowRight className="mt-1" />
                         </NavLink>
                     </div>
-
 
                     <p className="text-center text-3xl text-white mb-8">
                         Đặt khám nhanh - Lấy số thứ tự trực tuyến - Tư vấn sức khỏe từ xa
@@ -636,8 +628,6 @@ function Home() {
                         Xem tất cả
                         <MdKeyboardDoubleArrowRight className="mt-1" />
                     </NavLink>
-                </div>
-            </div>
                 </div>
             </div>
 
