@@ -284,7 +284,7 @@ function Home() {
                 </div>
             </div>
 
-            <div className="w-full bg-[#f0f7ff] pt-24">
+            <div className="w-full bg-[#f0f7ff] pt-20">
                 <div className="container mx-auto px-4">
                     <h2 className="text-center text-[28px] font-bold text-[#003366] mb-8">CƠ SỞ Y TẾ</h2>
                     <div className="relative max-w-screen-xl px-4">
@@ -350,7 +350,7 @@ function Home() {
                 </div>
             </div>
 
-            <div className="w-full bg-[#f0f7ff] pt-24">
+            <div className="w-full bg-[#f0f7ff] pt-20">
                 <div className="container mx-auto px-4">
                     <h2 className="text-center text-[28px] font-bold text-[#003366] mb-8">BÁC SĨ</h2>
                     <div className="relative max-w-screen-xl px-4">
@@ -429,7 +429,7 @@ function Home() {
                 </div>
             </div>
 
-            <div className="w-full bg-[#f0f7ff] pt-24 pb-12">
+            <div className="w-full bg-[#f0f7ff] pt-20 pb-12">
                 <div className="container mx-auto pb-8">
                     <h1 className="text-3xl font-bold text-center mb-8 text-[28px]">CHUYÊN KHOA</h1>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
