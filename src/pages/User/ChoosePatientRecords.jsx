@@ -91,7 +91,7 @@ function ChoosePatientRecord() {
     };
 
     return (
-        <div>
+        <div className='mb-16'>
             <h1 className="text-5xl font-bold mb-4 text-center mt-36">Chọn hồ sơ bệnh nhân</h1>
             <div className="flex justify-end mb-4 px-4">
                 <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600" onClick={handleAdd}>
@@ -102,7 +102,7 @@ function ChoosePatientRecord() {
                 {patientData.map((patient) => (
                     <div
                         key={patient.patientRecordId}
-                        className="bg-white shadow-xl rounded-lg overflow-hidden p-4 w-[650px] border-spacing-3 mt-4"
+                        className="bg-white shadow-xl rounded-lg border overflow-hidden p-4 w-[650px] border-spacing-3 mt-4"
                     >
                         <div className="space-y-4">
                             <div className="flex gap-1 relative top-5">

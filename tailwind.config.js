@@ -2,6 +2,9 @@ export default {
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
     theme: {
         extend: {
+            minHeight: {
+                'screen-minus-20': 'calc(100vh - 5rem)',
+            },
             animation: {
                 'rotate-fast': 'rotate-fast 1s ease-in-out', // Animation chạy trong 1 giây
             },

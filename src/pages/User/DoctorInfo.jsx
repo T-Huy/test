@@ -4,6 +4,8 @@ import { axiosInstance } from '~/api/apiRequest';
 import { Await, useSearchParams, useNavigate, useLocation } from 'react-router-dom'; // Dùng để lấy `patientRecordId` từ URL
 import parse from 'html-react-parser';
 import './CSS/DoctorDescription.css';
+import { GrLocation } from 'react-icons/gr';
+import { CiHospital1 } from 'react-icons/ci';
 
 function DoctorInfo() {
     const [selectedTime, setSelectedTime] = useState('');
@@ -119,32 +121,29 @@ function DoctorInfo() {
     // console.log('customDescription:', customDescription);
 
     return (
-        <div className="max-w-fit mx-auto p-6 mt-24">
+        <div className="max-w-fit mx-auto p-6 mt-24 ">
             {/* Doctor Info Section */}
-            <div className="flex items-start gap-6 mb-8">
+            <div className="flex items-center gap-6 mb-8">
                 <img
                     src={`${IMAGE_URL}${doctorInfo.image}`} // Thay thế URL này bằng link ảnh thực tế của bác sĩ
                     alt="Doctor profile"
-                    className="w-32 h-32 object-cover rounded-full"
+                    className="w-44 h-44 object-cover rounded-lg"
                 />
                 <div className="flex-1">
                     <h1 className="text-5xl font-bold mb-2">
                         {doctorInfo.position} {doctorInfo.fullname}
                     </h1>
-
-                    <div className="flex items-center gap-2 mt-3 text-gray-600">
-                        <MapPin className="w-4 h-4" />
-                        {/* <span>{getCityFromAddress(doctorInfo.addressClinic)}</span> */}
-                        {/* <span>{doctorInfo.addressClinic}</span> */}
-                        <span>{getCityFromAddress(doctorInfo.address || '')}</span>
+                    <div className="flex items-start gap-2">
+                        <GrLocation className="mt-1" />
+                        {getCityFromAddress(doctorInfo.address || '')}
                     </div>
                 </div>
             </div>
 
             {/* Schedule Section */}
             <div className="grid md:grid-cols-3 gap-6">
-                <div className="md:col-span-2">
-                    <div className="border rounded-lg p-4 h-fit">
+                <div className="md:col-span-2 h-[247px]">
+                    <div className="border rounded-lg p-4 h-full">
                         <div className="flex items-center gap-2 mb-4">
                             <Clock className="w-5 h-5 text-blue-500" />
                             <h2 className="font-semibold text-3xl">LỊCH KHÁM</h2>
@@ -153,24 +152,28 @@ function DoctorInfo() {
                             type="date"
                             value={currentDate}
                             onChange={handleDateChange}
-                            className={`w-1/3 p-1 border rounded`}
+                            className="w-1/3 p-1 border rounded-lg cursor-pointer"
                         />
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-5">
-                            {schedule.length > 0
-                                ? mapTimeTypeToLabel(schedule[0]).map(({ value, label }, index) => (
-                                      <button
-                                          key={index}
-                                          onClick={() => handleTimeSlotClick(value)}
-                                          className={`p-3 rounded text-xl font-semibold ${
-                                              selectedTime === label
-                                                  ? 'bg-blue-500 text-white'
-                                                  : 'bg-gray-100 hover:bg-gray-200'
-                                          }`}
-                                      >
-                                          {label}
-                                      </button>
-                                  ))
-                                : 'Không có lịch khám nào'}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-5 h-[112.5px] items-center">
+                            {schedule.length > 0 ? (
+                                mapTimeTypeToLabel(schedule[0]).map(({ value, label }, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handleTimeSlotClick(value)}
+                                        className={`p-3 rounded text-xl font-semibold ${
+                                            selectedTime === label
+                                                ? 'bg-blue-500 text-white'
+                                                : 'bg-gray-100 hover:bg-gray-200'
+                                        }`}
+                                    >
+                                        {label}
+                                    </button>
+                                ))
+                            ) : (
+                                <p className="col-span-2 md:col-span-1 md:col-start-2 font-medium">
+                                    Không có lịch khám nào
+                                </p>
+                            )}
                         </div>
                         <p className="flex justify-start items-end text-gray-500 text-xl mt-6">
                             Chọn và đặt (Phí đặt lịch 0đ)
@@ -180,15 +183,21 @@ function DoctorInfo() {
 
                 <div className="space-y-6">
                     {/* Location Info */}
-                    <div className="border rounded-lg p-4 w-[270px]">
-                        <h2 className="font-semibold mb-3">ĐỊA CHỈ KHÁM</h2>
-                        <p className="font-medium">{doctorInfo.clinicName}</p>
-                        <p className="text-gray-600">{doctorInfo.addressClinic}</p>
+                    <div className="flex flex-col gap-4 justify-between border rounded-lg p-4 w-[280px]">
+                        <h2 className="font-semibold">ĐỊA CHỈ KHÁM</h2>
+                        <div className="flex items-start gap-2">
+                            <CiHospital1 className="mt-1" />
+                            <span>{doctorInfo.clinicName}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                            <GrLocation className="mt-1" />
+                            {doctorInfo.addressClinic}
+                        </div>
                     </div>
 
                     {/* Fee Info */}
                     <div className="border rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-3">
+                        <div className="flex items-center gap-2">
                             <CreditCard className="w-5 h-5 text-gray-500" />
                             <h2 className="font-semibold">GIÁ KHÁM: {formatCurrency(doctorInfo.price)}</h2>
                             {/* {doctorInfo.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })} */}
@@ -199,7 +208,7 @@ function DoctorInfo() {
 
             {/* Work History */}
 
-            <div className="doctor-description leading-7 w-[600px]">
+            <div className="doctor-description leading-7 my-6 border w-full p-4">
                 {doctorInfo.description ? parse(doctorInfo.description) : 'Mô tả không có sẵn'}
             </div>
         </div>
