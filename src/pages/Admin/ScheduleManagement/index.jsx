@@ -56,9 +56,9 @@ const ScheduleManagement = () => {
         try {
             const response = await axiosInstance.get(`/user/${userId}`);
 
-            if (response.status === "OK") {
+            if (response.status === 'OK') {
                 // Xử lý khi thành công
-                setAvata(response.data.image)
+                setAvata(response.data.image);
             } else {
                 console.error('Failed to update schedule:', response.message);
             }
@@ -71,7 +71,7 @@ const ScheduleManagement = () => {
         try {
             const response = await axiosInstance.put(`/booking/${updateSchedule.bookingId}`, data);
 
-            if (response.status === "OK") {
+            if (response.status === 'OK') {
                 // Xử lý khi thành công
                 await filterScheduleAPI();
             } else {
@@ -86,7 +86,7 @@ const ScheduleManagement = () => {
         setUpdateSchedule({ ...updateSchedule, bookingId: bookingId });
         try {
             const response = await axiosInstance.get(`/booking/${bookingId}`);
-            if (response.status === "OK") {
+            if (response.status === 'OK') {
                 // Xử lý khi thành công
                 setUpdateSchedule({
                     bookingId: response.data.bookingId,
@@ -97,7 +97,7 @@ const ScheduleManagement = () => {
                     phoneNumber: response.data.patientRecordId.phoneNumber,
                     address: response.data.patientRecordId.address,
                     status: response.data.status,
-                })
+                });
             } else {
                 console.error('Failed to get detail booking:', response.message);
             }
@@ -108,11 +108,13 @@ const ScheduleManagement = () => {
 
     const filterScheduleAPI = async () => {
         try {
-            const response = await axiosInstance.get(`/booking/?query=${filterValue}&date=${filterDate}&status=${selectedStatus}&page=${pagination.page}&limit=${pagination.limit}`);
+            const response = await axiosInstance.get(
+                `/booking/?query=${filterValue}&date=${filterDate}&status=${selectedStatus}&page=${pagination.page}&limit=${pagination.limit}`,
+            );
             if (response.status === 'OK') {
                 setSchedules(response.data);
                 if (response.totalPages === 0) {
-                    response.totalPages = 1
+                    response.totalPages = 1;
                 }
                 if (pagination.totalPages !== response.totalPages) {
                     setPagination((prev) => ({
@@ -123,15 +125,13 @@ const ScheduleManagement = () => {
                 }
             } else {
                 console.error('No worktimes are found:', response.message);
-                setSchedules([])
+                setSchedules([]);
             }
         } catch (error) {
             console.error('Error fetching worktimes:', error);
-            setSchedules([])
+            setSchedules([]);
         }
     };
-
-
 
     // const filteredSchedules =
     //     selectedStatus === '' ? schedules : schedules.filter((sche) => sche.status === selectedStatus);
@@ -148,7 +148,7 @@ const ScheduleManagement = () => {
     };
     //Đổi số lượng (limit)
     const handleLimitChange = async (e) => {
-        const newLimit = parseInt(e.target.value, 10)
+        const newLimit = parseInt(e.target.value, 10);
         setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
     };
 
@@ -182,7 +182,7 @@ const ScheduleManagement = () => {
             setValidationErrors(errors); // Cập nhật lỗi
             return; // Ngăn không thêm nếu có lỗi
         }
-        updateScheduleAPI(updateSchedule)
+        updateScheduleAPI(updateSchedule);
         alert('Cập nhật lịch hẹn thành công!');
         setValidationErrors(errors);
         console.log('Updated Schedule Info:', updateSchedule);
@@ -260,10 +260,11 @@ const ScheduleManagement = () => {
                     {menuItems.map((item) => (
                         <li
                             key={item.path}
-                            className={`cursor-pointer flex items-center px-4 py-2 rounded ${location.pathname === item.path
-                                ? 'bg-pink-500 text-white' // Nền hồng cho mục hiện tại
-                                : 'hover:bg-gray-200' // Hover hiệu ứng cho mục khác
-                                } ${isExpanded ? 'justify-start' : 'justify-center'}`}
+                            className={`cursor-pointer flex items-center px-4 py-2 rounded ${
+                                location.pathname === item.path
+                                    ? 'bg-pink-500 text-white' // Nền hồng cho mục hiện tại
+                                    : 'hover:bg-gray-200' // Hover hiệu ứng cho mục khác
+                            } ${isExpanded ? 'justify-start' : 'justify-center'}`}
                             onClick={() => navigate(item.path)}
                         >
                             <span className="text-xl">{item.icon}</span>
@@ -299,7 +300,11 @@ const ScheduleManagement = () => {
                                 <span className="font-bold">Admin</span>
                                 <div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
                                     <img
-                                        src={avata ? `http://localhost:9000/uploads/${avata}` : 'http://localhost:3000/src/assets/img/avatar.png'}
+                                        src={
+                                            avata
+                                                ? `http://localhost:9000/uploads/${avata}`
+                                                : 'http://localhost:3000/src/assets/img/avatar.png'
+                                        }
                                         alt="Profile"
                                         className="w-full h-full object-cover"
                                     />
@@ -318,7 +323,12 @@ const ScheduleManagement = () => {
                                 >
                                     <ul className="py-2">
                                         {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Hồ sơ cá nhân</li> */}
-                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>Đăng xuất</li>
+                                        <li
+                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={handleLogout}
+                                        >
+                                            Đăng xuất
+                                        </li>
                                     </ul>
                                 </div>
                             )}
@@ -343,7 +353,12 @@ const ScheduleManagement = () => {
                                     onChange={(e) => setFilterValue(e.target.value)}
                                     className="border border-gray-400 rounded px-3 py-2 w-96"
                                 />
-                                <button className="bg-gray-200 border border-gray-400 px-4 py-2 rounded" onClick={() => filterScheduleAPI()}>🔍</button>
+                                <button
+                                    className="bg-gray-200 border border-gray-400 px-4 py-2 rounded"
+                                    onClick={() => filterScheduleAPI()}
+                                >
+                                    🔍
+                                </button>
                             </div>
                             <div>
                                 <input
@@ -363,14 +378,16 @@ const ScheduleManagement = () => {
                             { label: 'Thanh toán trực tiếp', value: 'S1' },
                             { label: 'Đã thanh toán', value: 'S2' },
                             { label: 'Đã khám xong', value: 'S3' },
-                            { label: 'Đã hủy', value: 'S4' }
-                        ].filter((statusOption) => statusOption.label.trim() !== '') // Loại bỏ khoảng trống
+                            { label: 'Đã hủy', value: 'S4' },
+                        ]
+                            .filter((statusOption) => statusOption.label.trim() !== '') // Loại bỏ khoảng trống
                             .map((statusOption) => (
                                 <button
                                     key={statusOption.value}
                                     onClick={() => setSelectedStatus(statusOption.value)}
-                                    className={`px-4 py-2 rounded border ${selectedStatus === statusOption.value ? 'bg-gray-300 font-bold' : 'bg-white'
-                                        }`}
+                                    className={`px-4 py-2 rounded border ${
+                                        selectedStatus === statusOption.value ? 'bg-gray-300 font-bold' : 'bg-white'
+                                    }`}
                                 >
                                     {statusOption.label}
                                 </button>
@@ -403,22 +420,31 @@ const ScheduleManagement = () => {
                                             {getTimeValue(sche.timeType)} {/* Gọi hàm để lấy value */}
                                         </td>
                                         <td className="border border-gray-300 px-2 py-1">{sche.doctorId.fullname}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{sche.patientRecordId.fullname}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{sche.patientRecordId.phoneNumber}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{sche.patientRecordId.address}</td>
+                                        <td className="border border-gray-300 px-2 py-1">
+                                            {sche.patientRecordId.fullname}
+                                        </td>
+                                        <td className="border border-gray-300 px-2 py-1">
+                                            {sche.patientRecordId.phoneNumber}
+                                        </td>
+                                        <td className="border border-gray-300 px-2 py-1">
+                                            {sche.patientRecordId.address}
+                                        </td>
                                         <td className="border border-gray-300 px-2 py-1">
                                             {(() => {
                                                 const statusMapping = {
-                                                    S1: "Thanh toán trực tiếp",
-                                                    S2: "Đã thanh toán",
-                                                    S3: "Đã khám xong",
-                                                    S4: "Đã hủy",
+                                                    S1: 'Thanh toán trực tiếp',
+                                                    S2: 'Đã thanh toán',
+                                                    S3: 'Đã khám xong',
+                                                    S4: 'Đã hủy',
                                                 };
-                                                return statusMapping[sche.status] || "Không xác định";
+                                                return statusMapping[sche.status] || 'Đang xử lý';
                                             })()}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2 text-center space-x-8">
-                                            <button className="text-blue-500" onClick={() => getDetailScheduleAPI(sche.bookingId)}>
+                                            <button
+                                                className="text-blue-500"
+                                                onClick={() => getDetailScheduleAPI(sche.bookingId)}
+                                            >
                                                 ✏️
                                             </button>
                                         </td>
@@ -435,7 +461,8 @@ const ScheduleManagement = () => {
                     </table>
                     {/* Điều hướng phân trang */}
                     <div className="flex justify-end items-center space-x-4 mt-4">
-                        <select className="border border-gray-400"
+                        <select
+                            className="border border-gray-400"
                             name="number"
                             value={pagination.limit}
                             onChange={handleLimitChange}
@@ -446,15 +473,24 @@ const ScheduleManagement = () => {
                         </select>
                     </div>
                     <div className="flex justify-end items-center space-x-4 mt-4">
-                        <button className={`${pagination.page === 1 ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+                        <button
+                            className={`${
+                                pagination.page === 1 ? 'font-normal text-gray-500' : 'font-bold text-blue-500'
+                            }`}
                             onClick={() => handlePageChange(pagination.page - 1)}
-                            disabled={pagination.page === 1}>
+                            disabled={pagination.page === 1}
+                        >
                             Previous
                         </button>
                         <span>
                             Page {pagination.page} of {pagination.totalPages}
                         </span>
-                        <button className={`${pagination.page === pagination.totalPages ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+                        <button
+                            className={`${
+                                pagination.page === pagination.totalPages
+                                    ? 'font-normal text-gray-500'
+                                    : 'font-bold text-blue-500'
+                            }`}
                             onClick={() => handlePageChange(pagination.page + 1)}
                             disabled={pagination.page === pagination.totalPages}
                         >
