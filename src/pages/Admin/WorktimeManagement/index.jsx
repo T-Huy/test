@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef,useContext } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHospital, faGauge, faClock, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoMenu } from "react-icons/io5";
 import { UserContext } from "~/context/UserContext";
+import { axiosInstance } from '~/api/apiRequest';
+
 const WorktimeManagement = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,63 +14,241 @@ const WorktimeManagement = () => {
   const [selectedTimes, setSelectedTimes] = useState([]);
   const [selectedTimesUpdate, setSelectedTimesUpdate] = useState([]);
   const { logout } = useContext(UserContext);
-  const [worktime, setWorktime] = useState({
-    date: "",
-    doctor: "",
-    times: [""],
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [filterValue, setFilterValue] = useState('');
+  const [filterDate, setFilterDate] = useState('');
+  const [pagination, setPagination] = useState({ page: 1, limit: 6, totalPages: 1 });
+  const [doctors, setDoctors] = useState([]);
+  const [worktimes, setWorkTimes] = useState([]);
+
+  useEffect(() => {
+    getDropdownDoctors()
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await filterWorkTimeAPI();
+    };
+    fetchData();
+  }, [pagination, filterValue, filterDate]);
+
+  const [worktime, setWorkTime] = useState({
+    //scheduleId: "",
+    scheduleDate: "",
+    doctorId: "",
+    timeTypes: [],
   });
 
-  const [updateWorktime, setUpdateWorktime] = useState({
-    date: "2024-11-13",
-    doctor: "1",
-    times: ["7:00 - 7:30",
-      "7:30 - 8:00"],
+  const [updateWorkTime, setUpdateWorkTime] = useState({
+    //scheduleId: "",
+    scheduleDate: "",
+    doctorId: "",
+    timeTypes: [],
   });
+
+  const [deleteWorkTime, setDeleteWorkTime] = useState({
+    doctorId: '',
+    scheduleDate: ''
+  })
 
   const timeSlots = [
-    "7:00 - 7:30",
-    "7:30 - 8:00",
-    "8:00 - 8:30",
-    "8:30 - 9:00",
-    "9:00 - 9:30",
-    "10:00 - 10:30",
-    "10:30 - 11:00",
-    "13:30 - 14:00",
-    "14:00 - 14:30",
-    "14:30 - 15:00",
-    "15:30 - 16:00",
-    "16:00 - 16:30",
-    "16:30 - 17:00",
+    { label: '8:00 - 9:00', value: 'T1' },
+    { label: '9:00 - 10:00', value: 'T2' },
+    { label: '10:00 - 11:00', value: 'T3' },
+    { label: '11:00 - 12:00', value: 'T4' },
+    { label: '13:00 - 14:00', value: 'T5' },
+    { label: '14:00 - 15:00', value: 'T6' },
+    { label: '15:00 - 16:00', value: 'T7' },
+    { label: '16:00 - 17:00', value: 'T8' },
   ];
+
+  const getDropdownDoctors = async () => {
+    try {
+      const response = await axiosInstance.get(`/doctor/dropdown`);
+
+      if (response.errCode === 0) {
+        setDoctors(response.data);
+      } else {
+        console.error('No doctors are found:', response.message);
+        setDoctors([])
+      }
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+      setDoctors([])
+    }
+  };
+
+  const createWorkTimeAPI = async (data) => {
+    try {
+      const response = await axiosInstance.post('/schedule', data);
+
+      if (response.status === "OK") {
+        // Xử lý khi tạo thành công
+        await filterWorkTimeAPI();
+      } else {
+        console.error('Failed to create worktime:', response.message);
+      }
+    } catch (error) {
+      console.error('Error creating worktime:', error);
+    }
+  };
+  const updateWorkTimeAPI = async (data) => {
+    try {
+      const response = await axiosInstance.put(`/schedule/${updateWorkTime.doctorId}`, data);
+
+      if (response.status === "OK") {
+        // Xử lý khi thành công
+        await filterWorkTimeAPI();
+      } else {
+        console.error('Failed to update worktime:', response.message);
+      }
+    } catch (error) {
+      console.error('Error update worktime:', error);
+    }
+  };
+  const getDetailWorkTimeAPI = async (doctorId, scheduleDate) => {
+    handleOpenUpdateModal()
+    setUpdateWorkTime({ ...updateWorkTime, doctorId: doctorId, scheduleDate: scheduleDate });
+    try {
+      const response = await axiosInstance.get(`/schedule/${doctorId}?date=${scheduleDate}`);
+      if (response.status === "OK") {
+        // Xử lý khi thành công
+        setUpdateWorkTime({
+          //scheduleId: response.data.scheduleId,
+          scheduleDate: response.data[0].scheduleDate,
+          doctorId: response.data[0].doctorId.userId,
+          timeTypes: response.data[0].timeTypes,
+        })
+        setSelectedTimesUpdate(response.data[0].timeTypes)
+      } else {
+        console.error('Failed to get detail worktime:', response.message);
+      }
+    } catch (error) {
+      console.error('Error get detail worktime:', error);
+    }
+  };
+  const deleteWorkTimeAPI = async () => {
+    try {
+      const response = await axiosInstance.delete(`/schedule/${deleteWorkTime.doctorId}?date=${deleteWorkTime.scheduleDate}`);
+      if (response.status === "OK") {
+        // Xử lý khi thành công
+        await filterWorkTimeAPI();
+      } else {
+        console.error('Failed to delete user:', response.message);
+      }
+    } catch (error) {
+      console.error('Error delete user:', error);
+    }
+  };
+
+  const filterWorkTimeAPI = async () => {
+    try {
+      const response = await axiosInstance.get(`/schedule/?query=${filterValue}&date=${filterDate}&page=${pagination.page}&limit=${pagination.limit}`);
+      if (response.status === 'OK') {
+        setWorkTimes(response.data);
+        if (response.totalPages === 0) {
+          response.totalPages = 1
+        }
+        if (pagination.totalPages !== response.totalPages) {
+          setPagination((prev) => ({
+            ...prev,
+            page: 1,
+            totalPages: response.totalPages,
+          }));
+        }
+      } else {
+        console.error('No worktimes are found:', response.message);
+        setWorkTimes([])
+      }
+    } catch (error) {
+      console.error('Error fetching worktimes:', error);
+      setWorkTimes([])
+    }
+  };
+
+  // Chuyển trang
+  const handlePageChange = async (newPage) => {
+    if (newPage > 0 && newPage <= pagination.totalPages) {
+      setPagination((prev) => ({ ...prev, page: newPage }));
+    }
+  };
+  //Đổi số lượng (limit)
+  const handleLimitChange = async (e) => {
+    const newLimit = parseInt(e.target.value, 10)
+    setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
+  };
+
+  // Hàm tìm label dựa trên value
+  const getTimeValue = (time) => {
+    const timeSlot = timeSlots.find((slot) => slot.value === time);
+    return timeSlot?.label || time; // Trả về value hoặc label nếu không tìm thấy
+  };
 
   const handleTimeSlotClick = (time) => {
+    let times;
     if (selectedTimes.includes(time)) {
-      setSelectedTimes(selectedTimes.filter((t) => t !== time)); // Bỏ chọn nếu đã chọn
+      times = selectedTimes.filter((t) => t !== time); // Bỏ chọn nếu đã chọn
     } else {
-      setSelectedTimes([...selectedTimes, time]); // Thêm vào nếu chưa chọn
+      times = [...selectedTimes, time]; // Thêm vào nếu chưa chọn
+      setValidationErrors({ ...validationErrors, time: '' });
     }
+    setSelectedTimes(times)
+
+    setWorkTime((prevState) => ({
+      ...prevState,
+      timeTypes: times,
+    }));
   };
 
-  const handleTimeSlotUpdateClick = (time) => {
-    if (selectedTimesUpdate.includes(time)) {
-      setSelectedTimesUpdate(selectedTimesUpdate.filter((t) => t !== time)); // Bỏ chọn nếu đã chọn
+  const handleTimeSlotUpdateClick = (value) => {
+    let updatedTimes;
+
+    if (selectedTimesUpdate.includes(value)) {
+      // Loại bỏ giá trị nếu đã tồn tại
+      updatedTimes = selectedTimesUpdate.filter((time) => time !== value);
     } else {
-      setSelectedTimesUpdate([...selectedTimesUpdate, time]); // Thêm vào nếu chưa chọn
+      // Thêm giá trị mới
+      updatedTimes = [...selectedTimesUpdate, value];
+      setValidationErrors({ ...validationErrors, time: '' });
     }
+
+    setSelectedTimesUpdate(updatedTimes); // Cập nhật trạng thái selectedTimesUpdate
+
+    // Cập nhật updateWorkTime.timeTypes
+    setUpdateWorkTime((prevState) => ({
+      ...prevState,
+      timeTypes: updatedTimes,
+    }));
   };
 
-  const workTimeData = [
-    {
-      id: 1,
-      doctor: "Huy",
-      date: "06/10/2024",
-      times: ["7:00 - 7:30", "7:30 - 8:00", "8:00 - 8:30", "8:30 - 9:00"],
-    },
-  ];
+  const handleDeleteClick = (doctorId, scheduleDate) => {
+    setShowConfirm(true);
+    setDeleteWorkTime({
+      doctorId: doctorId,
+      scheduleDate: scheduleDate
+    })
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirm(false);
+    setDeleteWorkTime({
+      doctorId: '',
+      scheduleDate: ''
+    })
+  };
+
+  const handleConfirmDelete = () => {
+    deleteWorkTimeAPI(); // Gọi hàm xóa bệnh viện từ props hoặc API
+    setDeleteWorkTime({
+      doctorId: '',
+      scheduleDate: ''
+    })
+    setShowConfirm(false); // Ẩn hộp thoại sau khi xóa
+  };
 
   const handleLogout = () => {
     logout();
-};
+  };
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -77,68 +257,47 @@ const WorktimeManagement = () => {
   const handleCloseModal = () => {
     setValidationErrors({});
     setIsModalOpen(false);
-    setWorktime({
-      name: "",
-      email: "",
-      address: "",
-      phone: "",
-      description: "",
-      image: null,
+    setWorkTime({
+      scheduleDate: "",
+      doctorId: "",
+      timeTypes: [],
     });
+    setSelectedTimes([])
   };
 
   const handleOpenUpdateModal = () => {
     setIsUpdateModalOpen(true);
-    setSelectedTimesUpdate(updateWorktime.times)
+    setSelectedTimesUpdate(updateWorkTime.timeTypes)
   };
 
   const handleCloseUpdateModal = () => {
     setValidationErrors({});
     setIsUpdateModalOpen(false);
+    setSelectedTimesUpdate([])
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setWorktime({ ...worktime, [name]: value });
+    setWorkTime({ ...worktime, [name]: value });
+    setValidationErrors({ ...validationErrors, [name]: '' });
   };
 
   const handleUpdateChange = (e) => {
     const { name, value } = e.target;
-    setUpdateWorktime({ ...updateWorktime, [name]: value });
-  };
-
-  const imageInputRef = useRef(null); // Khai báo ref cho input file
-
-  const handleImageUpload = (e) => {
-    //setWorktime({ ...worktime, image: e.target.files[0] });
-    //url tạm thời
-    const file = e.target.files[0];
-    if (file) {
-      const objectURL = URL.createObjectURL(file);
-      setWorktime({ ...worktime, image: objectURL }); // Lưu blob URL
-    }
-  };
-
-  const handleUpdateImageUpload = (e) => {
-    //setWorktime({ ...worktime, image: e.target.files[0] });
-
-    //url tạm thời
-    const file = e.target.files[0];
-    if (file) {
-      const objectURL = URL.createObjectURL(file);
-      setUpdateWorktime({ ...updateWorktime, image: objectURL }); // Lưu blob URL
-    }
-    //base64
+    setUpdateWorkTime({ ...updateWorkTime, [name]: value });
+    setValidationErrors({ ...validationErrors, [name]: '' });
   };
 
   const handleAddWorktime = () => {
     const errors = {};
-    if (worktime.times.length === 0) errors.name = "Ca làm việc không được để trống.";
+    if (worktime.timeTypes.length === 0) errors.time = "Ca làm việc không được để trống.";
+    if (worktime.doctorId === '') errors.doctorId = "Bác sĩ không được để trống.";
+    if (worktime.scheduleDate === '') errors.scheduleDate = "Ngày khám không được để trống.";
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors); // Cập nhật lỗi
       return; // Ngăn không thêm nếu có lỗi
     }
-
+    createWorkTimeAPI(worktime)
     alert("Thêm ca làm việc thành công!");
     setValidationErrors(errors);
     console.log("New Worktime Info:", worktime);
@@ -147,16 +306,17 @@ const WorktimeManagement = () => {
 
   const handleUpdateWorktime = () => {
     const errors = {};
-    if (!updateWorktime.name) errors.name = "Ca làm việc không được để trống.";
+    if (updateWorkTime.timeTypes.length === 0) errors.time = "Ca làm việc không được để trống.";
+    if (updateWorkTime.doctorId === '') errors.doctorId = "Bác sĩ không được để trống.";
 
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors); // Cập nhật lỗi
       return; // Ngăn không thêm nếu có lỗi
     }
-
+    updateWorkTimeAPI(updateWorkTime)
     alert("Cập nhật ca làm việc thành công!");
     setValidationErrors(errors);
-    console.log("Updated Worktime Info:", updateWorktime);
+    console.log("Updated Worktime Info:", updateWorkTime);
     handleCloseUpdateModal();
   };
 
@@ -317,9 +477,11 @@ const WorktimeManagement = () => {
               <input
                 type="text"
                 placeholder="Tìm kiếm"
+                value={filterValue}
+                onChange={(e) => setFilterValue(e.target.value)}
                 className="border border-gray-400 rounded px-3 py-2 w-96"
               />
-              <button className="bg-gray-200 border border-gray-400 px-4 py-2 rounded">
+              <button className="bg-gray-200 border border-gray-400 px-4 py-2 rounded" onClick={() => filterWorkTimeAPI()}>
                 🔍
               </button>
             </div>
@@ -328,7 +490,8 @@ const WorktimeManagement = () => {
             <input
               type="date"
               className="border rounded px-2 py-1"
-              defaultValue="2024-11-13"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
             />
             {/* Nút Thêm */}
             <button
@@ -354,31 +517,61 @@ const WorktimeManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {workTimeData.map((item, index) => (
-                <tr key={item.id} className="text-center">
+              {worktimes.map((item, index) => (
+                <tr key={index} className="text-center">
                   <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
-                  <td className="border border-gray-300 px-4 py-2 text-center">{item.doctor}</td>
-                  <td className="border border-gray-300 px-4 py-2 text-center">{item.date}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">{item.doctorId.fullname}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">
+                    {item.scheduleDate.split('-').reverse().join('-')}
+                  </td>
                   <td className="border border-gray-300 px-4 py-2 text-center">
                     <div className="grid grid-cols-3 gap-2">
-                      {item.times.map((time, timeIndex) => (
+                      {item.timeTypes.map((time, timeIndex) => (
                         <span
                           key={timeIndex}
                           className="bg-gray-100 px-2 py-1 rounded border"
                         >
-                          {time}
+                          {getTimeValue(time)} {/* Gọi hàm để lấy value */}
                         </span>
                       ))}
                     </div>
                   </td>
                   <td className="border border-gray-300 px-4 py-2 text-center space-x-8">
-                    <button className="text-blue-500 hover:text-blue-700" onClick={handleOpenUpdateModal}>✏️</button>
-                    <button className="text-red-500 hover:text-red-700">🗑️</button>
+                    <button className="text-blue-500 hover:text-blue-700" onClick={() => getDetailWorkTimeAPI(item.doctorId.userId, item.scheduleDate)}>✏️</button>
+                    <button className="text-red-500 hover:text-red-700" onClick={() => handleDeleteClick(item.doctorId.userId, item.scheduleDate)}>🗑️</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {/* Điều hướng phân trang */}
+          <div className="flex justify-end items-center space-x-4 mt-4">
+            <select className="border border-gray-400"
+              name="number"
+              value={pagination.limit}
+              onChange={handleLimitChange}
+            >
+              <option value="6">6</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+          </div>
+          <div className="flex justify-end items-center space-x-4 mt-4">
+            <button className={`${pagination.page === 1 ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+              onClick={() => handlePageChange(pagination.page - 1)}
+              disabled={pagination.page === 1}>
+              Previous
+            </button>
+            <span>
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            <button className={`${pagination.page === pagination.totalPages ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+              onClick={() => handlePageChange(pagination.page + 1)}
+              disabled={pagination.page === pagination.totalPages}
+            >
+              Next
+            </button>
+          </div>
 
           {/* Modal Thêm Ca Làm Việc*/}
           {isModalOpen && (
@@ -396,26 +589,34 @@ const WorktimeManagement = () => {
                     <label>Chọn ngày</label>
                     <input
                       type="date"
-                      name="date"
-                      value={worktime.date}
+                      name="scheduleDate"
+                      value={worktime.scheduleDate}
                       onChange={handleChange}
                       className="border w-full px-2 py-1 rounded border-gray-400"
                     />
+                    {validationErrors.scheduleDate && (
+                      <p className="text-red-500 text-sm">{validationErrors.scheduleDate}</p>
+                    )}
                   </div>
                   <div>
                     <label>Chọn bác sĩ</label>
                     <select
                       type="text"
-                      name="phone"
-                      value={worktime.doctor}
+                      name="doctorId"
+                      value={worktime.doctorId}
                       onChange={handleChange}
                       className="border w-full px-2 py-1 rounded border-gray-400"
                     >
                       <option value="">Chọn bác sĩ</option>
-                      <option value="1">Huy</option>
-                      <option value="2">Cảnh</option>
-                      <option value="3">Thịnh</option>
+                      {doctors.map((doctor, index) => (
+                        <option key={index} value={doctor.doctorId.userId}>
+                          {doctor.doctorId.fullname}
+                        </option>
+                      ))}
                     </select>
+                    {validationErrors.doctorId && (
+                      <p className="text-red-500 text-sm">{validationErrors.doctorId}</p>
+                    )}
                   </div>
 
                 </div>
@@ -425,15 +626,18 @@ const WorktimeManagement = () => {
                   <div className="grid grid-cols-3 gap-2">
                     {timeSlots.map((time) => (
                       <button
-                        key={time}
-                        onClick={() => handleTimeSlotClick(time)}
-                        className={`border px-4 py-2 rounded ${selectedTimes.includes(time) ? "bg-gray-300 font-bold" : "bg-white"
+                        key={time.value}
+                        onClick={() => handleTimeSlotClick(time.value)}
+                        className={`border px-4 py-2 rounded ${selectedTimes.includes(time.value) ? "bg-gray-300 font-bold" : "bg-white"
                           }`}
                       >
-                        {time}
+                        {time.label}
                       </button>
                     ))}
                   </div>
+                  {validationErrors.time && (
+                    <p className="text-red-500 text-sm">{validationErrors.time}</p>
+                  )}
                 </div>
                 <div className="col-span-2 flex justify-end">
                   <button
@@ -459,30 +663,36 @@ const WorktimeManagement = () => {
                 <h2 className="text-xl font-bold mb-4">Cập nhật ca làm việc</h2>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label>Chọn ngày</label>
+                    <label>Ngày khám</label>
                     <input
                       type="date"
                       name="date"
-                      readOnly
-                      value={updateWorktime.date}
-                      onChange={handleChange}
-                      className="border w-full px-2 py-1 rounded border-gray-400"
+                      disabled
+                      value={updateWorkTime.scheduleDate}
+                      onChange={handleUpdateChange}
+                      className="border w-full px-2 py-1 rounded border-gray-100"
                     />
                   </div>
                   <div>
                     <label>Chọn bác sĩ</label>
                     <select
                       type="text"
-                      name="phone"
-                      value={updateWorktime.doctor}
-                      onChange={handleChange}
-                      className="border w-full px-2 py-1 rounded border-gray-400"
+                      name="doctorId"
+                      value={updateWorkTime.doctorId}
+                      onChange={handleUpdateChange}
+                      className={`border w-full px-2 py-1 rounded ${validationErrors.doctorId ? 'border-red-500' : 'border-gray-400'
+                        }`}
                     >
                       <option value="">Chọn bác sĩ</option>
-                      <option value="1">Huy</option>
-                      <option value="2">Cảnh</option>
-                      <option value="3">Thịnh</option>
+                      {doctors.map((doctor, index) => (
+                        <option key={index} value={doctor.doctorId.userId}>
+                          {doctor.doctorId.fullname}
+                        </option>
+                      ))}
                     </select>
+                    {validationErrors.doctorId && (
+                      <p className="text-red-500 text-sm">{validationErrors.doctorId}</p>
+                    )}
                   </div>
 
                 </div>
@@ -492,22 +702,45 @@ const WorktimeManagement = () => {
                   <div className="grid grid-cols-3 gap-2">
                     {timeSlots.map((time) => (
                       <button
-                        key={time}
-                        className={`border px-4 py-2 rounded ${selectedTimesUpdate.includes(time) ? "bg-gray-300 font-bold" : "bg-white"
+                        key={time.value}
+                        className={`border px-4 py-2 rounded ${selectedTimesUpdate.includes(time.value) ? "bg-gray-300 font-bold" : "bg-white"
                           }`}
-                        onClick={() => handleTimeSlotUpdateClick(time)}
+                        onClick={() => handleTimeSlotUpdateClick(time.value)}
                       >
-                        {time}
+                        {time.label}
                       </button>
                     ))}
                   </div>
+                  {validationErrors.time && (
+                    <p className="text-red-500 text-sm">{validationErrors.time}</p>
+                  )}
                 </div>
                 <div className="col-span-2 flex justify-end">
                   <button
                     onClick={handleUpdateWorktime}
                     className="bg-blue-500 text-white px-4 py-2 rounded"
                   >
-                    Thêm
+                    Cập nhật
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Hộp thoại xác nhận */}
+          {showConfirm && (
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+              <div className="bg-white p-6 rounded shadow-lg">
+                <h3 className="text-lg font-semibold mb-4">Xác nhận xóa ca làm việc</h3>
+                <p>Bạn có chắc chắn muốn xóa ca làm việc này?</p>
+                <div className="mt-4 flex justify-end gap-4">
+                  <button onClick={handleCancelDelete} className="px-4 py-2 bg-gray-500 text-white rounded">
+                    Hủy
+                  </button>
+                  <button
+                    onClick={handleConfirmDelete}
+                    className="px-4 py-2 bg-red-500 text-white rounded"
+                  >
+                    Xóa
                   </button>
                 </div>
               </div>
