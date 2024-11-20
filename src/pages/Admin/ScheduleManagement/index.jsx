@@ -4,88 +4,142 @@ import { faHospital, faGauge, faClock, faPlus } from '@fortawesome/free-solid-sv
 import { useNavigate, useLocation } from 'react-router-dom';
 import { IoMenu } from 'react-icons/io5';
 import { UserContext } from '~/context/UserContext';
+import { axiosInstance } from '~/api/apiRequest';
+
 const ScheduleManagement = () => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
     const [validationErrors, setValidationErrors] = useState({});
-    const [selectedStatus, setSelectedStatus] = useState('Tất cả');
+    const [selectedStatus, setSelectedStatus] = useState('');
     const { logout } = useContext(UserContext);
-    const [schedule, setSchedule] = useState({
-        scheduleId: '',
-        date: '',
-        time: '',
-        doctor: '',
-        patient: '',
-        phone: '',
+    const [filterValue, setFilterValue] = useState('');
+    const [filterDate, setFilterDate] = useState('');
+    const [pagination, setPagination] = useState({ page: 1, limit: 10, totalPages: 1 });
+    const [schedules, setSchedules] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await filterScheduleAPI();
+        };
+        fetchData();
+    }, [pagination, filterValue, filterDate, selectedStatus]);
+
+    const [updateSchedule, setUpdateSchedule] = useState({
+        bookingId: '',
+        appointmentDate: '',
+        timeType: '',
+        doctorName: '',
+        patientName: '',
+        phoneNumber: '',
         address: '',
         status: '',
     });
 
-    const [updateSchedule, setUpdateSchedule] = useState({
-        scheduleId: 1,
-        date: '2024-11-13',
-        time: 'T2',
-        doctor: 'Huy',
-        patient: 'Cảnh',
-        phone: '0987654321',
-        address: 'Bình Định',
-        status: 'S1',
-    });
-
-    const schedules = [
-        {
-            scheduleId: 1,
-            date: '06/10/2024',
-            time: 'T2', //9:00-9:30
-            doctor: 'Huy',
-            patient: 'Thịnh',
-            phone: '0987654321',
-            address: 'Long An',
-            status: 'S1', //Đã thanh toán
-        },
-        {
-            scheduleId: 2,
-            date: '06/10/2024',
-            time: 'T2', //9:00-9:30
-            doctor: 'Huy',
-            patient: 'Thịnh',
-            phone: '0987654321',
-            address: 'Long An',
-            status: 'S3', //Đã hủy
-        },
-        // Thêm các lịch hẹn khác nếu cần
+    const timeSlots = [
+        { label: '8:00 - 9:00', value: 'T1' },
+        { label: '9:00 - 10:00', value: 'T2' },
+        { label: '10:00 - 11:00', value: 'T3' },
+        { label: '11:00 - 12:00', value: 'T4' },
+        { label: '13:00 - 14:00', value: 'T5' },
+        { label: '14:00 - 15:00', value: 'T6' },
+        { label: '15:00 - 16:00', value: 'T7' },
+        { label: '16:00 - 17:00', value: 'T8' },
     ];
+
+    const updateScheduleAPI = async (data) => {
+        try {
+            const response = await axiosInstance.put(`/booking/${updateSchedule.bookingId}`, data);
+
+            if (response.status === "OK") {
+                // Xử lý khi thành công
+                await filterScheduleAPI();
+            } else {
+                console.error('Failed to update schedule:', response.message);
+            }
+        } catch (error) {
+            console.error('Error update schedule:', error);
+        }
+    };
+    const getDetailScheduleAPI = async (bookingId) => {
+        setIsUpdateModalOpen(true);
+        setUpdateSchedule({ ...updateSchedule, bookingId: bookingId });
+        try {
+            const response = await axiosInstance.get(`/booking/${bookingId}`);
+            if (response.status === "OK") {
+                // Xử lý khi thành công
+                setUpdateSchedule({
+                    bookingId: response.data.bookingId,
+                    appointmentDate: response.data.appointmentDate,
+                    timeType: response.data.timeType,
+                    doctorName: response.data.doctorId.fullname,
+                    patientName: response.data.patientRecordId.fullname,
+                    phoneNumber: response.data.patientRecordId.phoneNumber,
+                    address: response.data.patientRecordId.address,
+                    status: response.data.status,
+                })
+            } else {
+                console.error('Failed to get detail booking:', response.message);
+            }
+        } catch (error) {
+            console.error('Error get detail booking:', error);
+        }
+    };
+
+    const filterScheduleAPI = async () => {
+        try {
+            const response = await axiosInstance.get(`/booking/?query=${filterValue}&date=${filterDate}&status=${selectedStatus}&page=${pagination.page}&limit=${pagination.limit}`);
+            if (response.status === 'OK') {
+                setSchedules(response.data);
+                if (response.totalPages === 0) {
+                    response.totalPages = 1
+                }
+                if (pagination.totalPages !== response.totalPages) {
+                    setPagination((prev) => ({
+                        ...prev,
+                        page: 1,
+                        totalPages: response.totalPages,
+                    }));
+                }
+            } else {
+                console.error('No worktimes are found:', response.message);
+                setSchedules([])
+            }
+        } catch (error) {
+            console.error('Error fetching worktimes:', error);
+            setSchedules([])
+        }
+    };
+
+
+
+    // const filteredSchedules =
+    //     selectedStatus === '' ? schedules : schedules.filter((sche) => sche.status === selectedStatus);
 
     const handleLogout = () => {
         logout();
     };
 
-    const filteredSchedules =
-        selectedStatus === 'Tất cả' ? schedules : schedules.filter((sche) => sche.status === selectedStatus);
-
-    const handleOpenModal = () => {
-        setIsModalOpen(true);
+    // Chuyển trang
+    const handlePageChange = async (newPage) => {
+        if (newPage > 0 && newPage <= pagination.totalPages) {
+            setPagination((prev) => ({ ...prev, page: newPage }));
+        }
+    };
+    //Đổi số lượng (limit)
+    const handleLimitChange = async (e) => {
+        const newLimit = parseInt(e.target.value, 10)
+        setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
     };
 
-    const handleCloseModal = () => {
-        setValidationErrors({});
-        setIsModalOpen(false);
-        setSchedule({
-            scheduleId: '',
-            date: '',
-            time: '',
-            doctor: '',
-            patient: '',
-            phone: '',
-            address: '',
-            status: '',
-        });
+    // Hàm tìm label dựa trên value
+    const getTimeValue = (time) => {
+        const timeSlot = timeSlots.find((slot) => slot.value === time);
+        return timeSlot?.label || time; // Trả về value hoặc label nếu không tìm thấy
     };
 
     const handleOpenUpdateModal = () => {
         setIsUpdateModalOpen(true);
-        console.error();
     };
 
     const handleCloseUpdateModal = () => {
@@ -93,53 +147,22 @@ const ScheduleManagement = () => {
         setIsUpdateModalOpen(false);
     };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setSchedule({ ...schedule, [name]: value });
-    };
-
     const handleUpdateChange = (e) => {
         const { name, value } = e.target;
         setUpdateSchedule({ ...updateSchedule, [name]: value });
-    };
-
-    const imageInputRef = useRef(null); // Khai báo ref cho input file
-
-    const handleImageUpload = (e) => {
-        //url tạm thời
-        const file = e.target.files[0];
-        if (file) {
-            const objectURL = URL.createObjectURL(file);
-            setSchedule({ ...schedule, image: objectURL }); // Lưu blob URL
-        }
-    };
-
-    const handleUpdateImageUpload = (e) => {
-        //url tạm thời
-        const file = e.target.files[0];
-        if (file) {
-            const objectURL = URL.createObjectURL(file);
-            setUpdateSchedule({ ...updateSchedule, image: objectURL }); // Lưu blob URL
-        }
-        //base64
-    };
-
-    const handleAddSchedule = () => {
-        //Chưa có error do không dùng Thêm
-        alert('Thêm lịch hẹn thành công!');
-        console.log('New Schedule Info:', schedule);
-        handleCloseModal();
+        setValidationErrors({ ...validationErrors, [name]: '' });
     };
 
     const handleUpdateSchedule = () => {
         const errors = {};
-        if (!updateSchedule.time) errors.time = 'Ca khám không được để trống.';
+        if (!updateSchedule.timeType) errors.timeType = 'Ca khám không được để trống.';
         if (!updateSchedule.status) errors.status = 'Trạng thái không được để trống.';
 
         if (Object.keys(errors).length > 0) {
             setValidationErrors(errors); // Cập nhật lỗi
             return; // Ngăn không thêm nếu có lỗi
         }
+        updateScheduleAPI(updateSchedule)
         alert('Cập nhật lịch hẹn thành công!');
         setValidationErrors(errors);
         console.log('Updated Schedule Info:', updateSchedule);
@@ -217,11 +240,10 @@ const ScheduleManagement = () => {
                     {menuItems.map((item) => (
                         <li
                             key={item.path}
-                            className={`cursor-pointer flex items-center px-4 py-2 rounded ${
-                                location.pathname === item.path
-                                    ? 'bg-pink-500 text-white' // Nền hồng cho mục hiện tại
-                                    : 'hover:bg-gray-200' // Hover hiệu ứng cho mục khác
-                            } ${isExpanded ? 'justify-start' : 'justify-center'}`}
+                            className={`cursor-pointer flex items-center px-4 py-2 rounded ${location.pathname === item.path
+                                ? 'bg-pink-500 text-white' // Nền hồng cho mục hiện tại
+                                : 'hover:bg-gray-200' // Hover hiệu ứng cho mục khác
+                                } ${isExpanded ? 'justify-start' : 'justify-center'}`}
                             onClick={() => navigate(item.path)}
                         >
                             <span className="text-xl">{item.icon}</span>
@@ -300,40 +322,42 @@ const ScheduleManagement = () => {
                                 <input
                                     type="text"
                                     placeholder="Tìm kiếm"
+                                    value={filterValue}
+                                    onChange={(e) => setFilterValue(e.target.value)}
                                     className="border border-gray-400 rounded px-3 py-2 w-96"
                                 />
-                                <button className="bg-gray-200 border border-gray-400 px-4 py-2 rounded">🔍</button>
+                                <button className="bg-gray-200 border border-gray-400 px-4 py-2 rounded" onClick={() => filterScheduleAPI()}>🔍</button>
                             </div>
                             <div>
-                                <input type="date" className="border rounded px-2 py-1" defaultValue="2024-11-13" />
+                                <input
+                                    type="date"
+                                    className="border rounded px-2 py-1"
+                                    value={filterDate}
+                                    onChange={(e) => setFilterDate(e.target.value)}
+                                />
                             </div>
                         </div>
-
-                        {/* Nút Thêm */}
-                        {/* <button
-              className="flex items-center space-x-2 bg-gray-200 border border-gray-400 px-4 py-2 rounded"
-              onClick={handleOpenModal}
-            >
-              <span>Thêm</span>
-              <span>
-                <FontAwesomeIcon icon={faPlus} />
-              </span>
-            </button> */}
                     </div>
 
                     {/* Status Filters */}
                     <div className="flex space-x-4 mb-4">
-                        {['Tất cả', 'Đã thanh toán', 'Đã khám xong', 'Đã hủy'].map((status) => (
-                            <button
-                                key={status}
-                                onClick={() => setSelectedStatus(status)}
-                                className={`px-4 py-2 rounded border ${
-                                    selectedStatus === status ? 'bg-gray-300 font-bold' : 'bg-white'
-                                }`}
-                            >
-                                {status}
-                            </button>
-                        ))}
+                        {[
+                            { label: 'Tất cả', value: '' },
+                            { label: 'Thanh toán trực tiếp', value: 'S1' },
+                            { label: 'Đã thanh toán', value: 'S2' },
+                            { label: 'Đã khám xong', value: 'S3' },
+                            { label: 'Đã hủy', value: 'S4' }
+                        ].filter((statusOption) => statusOption.label.trim() !== '') // Loại bỏ khoảng trống
+                            .map((statusOption) => (
+                                <button
+                                    key={statusOption.value}
+                                    onClick={() => setSelectedStatus(statusOption.value)}
+                                    className={`px-4 py-2 rounded border ${selectedStatus === statusOption.value ? 'bg-gray-300 font-bold' : 'bg-white'
+                                        }`}
+                                >
+                                    {statusOption.label}
+                                </button>
+                            ))}
                     </div>
                     {/* Bảng */}
                     <table className="w-full border border-gray-300">
@@ -351,19 +375,33 @@ const ScheduleManagement = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredSchedules.length > 0 ? (
-                                filteredSchedules.map((sche, index) => (
-                                    <tr key={sche.id} className="text-center">
+                            {schedules.length > 0 ? (
+                                schedules.map((sche, index) => (
+                                    <tr key={sche.bookingId} className="text-center">
                                         <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{sche.date}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{sche.time}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{sche.doctor}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{sche.patient}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{sche.phone}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{sche.address}</td>
-                                        <td className="border border-gray-300 px-2 py-1">{sche.status}</td>
+                                        <td className="border border-gray-300 px-2 py-1">
+                                            {sche.appointmentDate.split('-').reverse().join('-')}
+                                        </td>
+                                        <td className="border border-gray-300 px-2 py-1">
+                                            {getTimeValue(sche.timeType)} {/* Gọi hàm để lấy value */}
+                                        </td>
+                                        <td className="border border-gray-300 px-2 py-1">{sche.doctorId.fullname}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{sche.patientRecordId.fullname}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{sche.patientRecordId.phoneNumber}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{sche.patientRecordId.address}</td>
+                                        <td className="border border-gray-300 px-2 py-1">
+                                            {(() => {
+                                                const statusMapping = {
+                                                    S1: "Thanh toán trực tiếp",
+                                                    S2: "Đã thanh toán",
+                                                    S3: "Đã khám xong",
+                                                    S4: "Đã hủy",
+                                                };
+                                                return statusMapping[sche.status] || "Không xác định";
+                                            })()}
+                                        </td>
                                         <td className="border border-gray-300 px-4 py-2 text-center space-x-8">
-                                            <button className="text-blue-500" onClick={handleOpenUpdateModal}>
+                                            <button className="text-blue-500" onClick={() => getDetailScheduleAPI(sche.bookingId)}>
                                                 ✏️
                                             </button>
                                         </td>
@@ -378,6 +416,34 @@ const ScheduleManagement = () => {
                             )}
                         </tbody>
                     </table>
+                    {/* Điều hướng phân trang */}
+                    <div className="flex justify-end items-center space-x-4 mt-4">
+                        <select className="border border-gray-400"
+                            name="number"
+                            value={pagination.limit}
+                            onChange={handleLimitChange}
+                        >
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                    <div className="flex justify-end items-center space-x-4 mt-4">
+                        <button className={`${pagination.page === 1 ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+                            onClick={() => handlePageChange(pagination.page - 1)}
+                            disabled={pagination.page === 1}>
+                            Previous
+                        </button>
+                        <span>
+                            Page {pagination.page} of {pagination.totalPages}
+                        </span>
+                        <button className={`${pagination.page === pagination.totalPages ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+                            onClick={() => handlePageChange(pagination.page + 1)}
+                            disabled={pagination.page === pagination.totalPages}
+                        >
+                            Next
+                        </button>
+                    </div>
 
                     {/* Modal Cập Nhật lịch hẹn */}
                     {isUpdateModalOpen && (
@@ -395,11 +461,12 @@ const ScheduleManagement = () => {
                                         <label>Ngày khám</label>
                                         <input
                                             type="date"
-                                            name="date"
+                                            name="appointmentDate"
                                             readOnly
-                                            value={updateSchedule.date}
+                                            value={updateSchedule.appointmentDate}
                                             onChange={handleUpdateChange}
-                                            className="border border-gray-400 w-full px-2 py-1 rounded"
+                                            disabled
+                                            className="border border-gray-100 w-full px-2 py-1 rounded"
                                         />
                                     </div>
                                 </div>
@@ -408,8 +475,8 @@ const ScheduleManagement = () => {
                                         <label>Bác sĩ</label>
                                         <input
                                             type="text"
-                                            name="doctor"
-                                            value={updateSchedule.doctor}
+                                            name="doctorName"
+                                            value={updateSchedule.doctorName}
                                             disabled
                                             className="border border-gray-100 w-full px-2 py-1 rounded"
                                         />
@@ -418,8 +485,8 @@ const ScheduleManagement = () => {
                                         <label>Bệnh nhân</label>
                                         <input
                                             type="text"
-                                            name="role"
-                                            value={updateSchedule.patient}
+                                            name="patientName"
+                                            value={updateSchedule.patientName}
                                             onChange={handleUpdateChange}
                                             disabled
                                             className="border border-gray-100 w-full px-2 py-1 rounded"
@@ -429,17 +496,21 @@ const ScheduleManagement = () => {
                                         <label>Ca khám</label>
                                         <select
                                             type="text"
-                                            name="time"
-                                            value={updateSchedule.time}
+                                            name="timeType"
+                                            value={updateSchedule.timeType}
                                             onChange={handleUpdateChange}
                                             className="border border-gray-400 w-full px-2 py-1 rounded"
                                         >
                                             <option value="">Chọn ca khám</option>
-                                            <option value="T1">8:00-8:30</option>
-                                            <option value="T2">9:00-9:30</option>
-                                            <option value="T3">10:00-10:30</option>
-                                            <option value="T4">11:00-11:30</option>
+                                            {timeSlots.map((time, index) => (
+                                                <option key={index} value={time.value}>
+                                                    {time.label}
+                                                </option>
+                                            ))}
                                         </select>
+                                        {validationErrors.timeType && (
+                                            <p className="text-red-500 text-sm">{validationErrors.timeType}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <label>Địa chỉ</label>
@@ -462,17 +533,21 @@ const ScheduleManagement = () => {
                                             className="border border-gray-400 w-full px-2 py-1 rounded"
                                         >
                                             <option value="">Chọn trạng thái</option>
-                                            <option value="S1">Đã thanh toán</option>
-                                            <option value="S2">Đã khám xong</option>
-                                            <option value="S3">Đã hủy</option>
+                                            <option value="S1">Thanh toán trực tiếp</option>
+                                            <option value="S2">Đã thanh toán</option>
+                                            <option value="S3">Đã khám xong</option>
+                                            <option value="S4">Đã hủy</option>
                                         </select>
+                                        {validationErrors.status && (
+                                            <p className="text-red-500 text-sm">{validationErrors.status}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <label>Số điện thoại</label>
                                         <input
                                             type="text"
-                                            name="phone"
-                                            value={updateSchedule.phone}
+                                            name="phoneNumber"
+                                            value={updateSchedule.phoneNumber}
                                             onChange={handleUpdateChange}
                                             disabled
                                             className="border border-gray-100 w-full px-2 py-1 rounded"
