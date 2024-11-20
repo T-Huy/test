@@ -7,12 +7,14 @@ import { toast } from 'react-toastify';
 import ConfirmationModal from '~/components/Confirm/ConfirmationModal';
 
 const AppointmentManagement = () => {
-    const [activeTab, setActiveTab] = useState('cancelled');
+    const [activeTab, setActiveTab] = useState('paid');
     const [appointments, setAppointments] = useState([]);
     const [error, setError] = useState(null);
     const { user } = useContext(UserContext);
 
     const tabs = [
+        // chưa thanh toán
+        { id: 'unpaid', label: 'Chưa thanh toán', keyMap: 'S1' },
         { id: 'paid', label: 'Đã thanh toán', keyMap: 'S2' },
         { id: 'examined', label: 'Đã khám', keyMap: 'S3' },
         { id: 'cancelled', label: 'Đã hủy', keyMap: 'S4' },
@@ -65,6 +67,8 @@ const AppointmentManagement = () => {
             const response = await axiosInstance.put(`/booking/${selectedBookingId}`, {
                 status: 'S4',
             });
+
+            console.log('Responsese:', response);
 
             if (response.status === 'OK') {
                 toast.success('Hủy lịch hẹn thành công.');

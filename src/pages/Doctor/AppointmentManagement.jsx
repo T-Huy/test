@@ -26,7 +26,7 @@ function PatientManagement() {
 
             try {
                 const response = await axiosInstance.get(`/booking/doctor/8?date=${selectedDate}`);
-                console.log('Response::', response);
+                console.log('ResponseBooking:', response);
 
                 if (response.status === 'OK') {
                     setAppointments(response.data);
@@ -119,48 +119,54 @@ function PatientManagement() {
                     </tr>
                 </thead>
                 <tbody>
-                    {appointments.map((appointment, index) => (
-                        <tr key={appointment._id}>
-                            <td className="border p-2">{index + 1}</td>
-                            <td className="border p-2">{appointment.timeType.valueVi}</td>
-                            <td className="border p-2">{appointment.patientRecordId.fullname}</td>
-                            <td className="border p-2">{appointment.patientRecordId.address}</td>
-                            <td className="border p-2">{appointment.patientRecordId.phoneNumber}</td>
-                            <td className="border p-2">
-                                {appointment.patientRecordId.gender === 'Male'
-                                    ? 'Nam'
-                                    : appointment.patientRecordId.gender === 'Female'
-                                    ? 'Nữ'
-                                    : 'Khác'}
-                            </td>
-                            <td className="border p-2">{appointment.reason}</td>
-                            <td className="border p-2">{appointment.status.valueVi}</td>
-                            <td className="border p-2 space-x-2">
-                                <button
-                                    className={`p-1 rounded ${
-                                        appointment.status.keyMap === 'S3' || appointment.status.keyMap === 'S4'
-                                            ? 'bg-blue-200 text-gray-500 cursor-not-allowed'
-                                            : 'bg-blue-500 text-white'
-                                    }`}
-                                    onClick={() => updateStatus(appointment.bookingId, 'S3')}
-                                    disabled={appointment.status.keyMap === 'S3' || appointment.status.keyMap === 'S4'}
-                                >
-                                    Hoàn thành
-                                </button>
-                                <button
-                                    className={`p-1 rounded ${
-                                        appointment.status.keyMap === 'S3' || appointment.status.keyMap === 'S4'
-                                            ? 'bg-red-200 text-gray-500 cursor-not-allowed'
-                                            : 'bg-red-500 text-white'
-                                    }`}
-                                    onClick={() => updateStatus(appointment.bookingId, 'S4')}
-                                    disabled={appointment.status.keyMap === 'S3' || appointment.status.keyMap === 'S4'}
-                                >
-                                    Hủy
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
+                    {appointments
+                        .filter((appointment) => appointment.status.keyMap !== 'S1')
+                        .map((appointment, index) => (
+                            <tr key={appointment._id}>
+                                <td className="border p-2">{index + 1}</td>
+                                <td className="border p-2">{appointment.timeType.valueVi}</td>
+                                <td className="border p-2">{appointment.patientRecordId.fullname}</td>
+                                <td className="border p-2">{appointment.patientRecordId.address}</td>
+                                <td className="border p-2">{appointment.patientRecordId.phoneNumber}</td>
+                                <td className="border p-2">
+                                    {appointment.patientRecordId.gender === 'Male'
+                                        ? 'Nam'
+                                        : appointment.patientRecordId.gender === 'Female'
+                                        ? 'Nữ'
+                                        : 'Khác'}
+                                </td>
+                                <td className="border p-2">{appointment.reason}</td>
+                                <td className="border p-2">{appointment.status.valueVi}</td>
+                                <td className="border p-2 space-x-2">
+                                    <button
+                                        className={`p-1 rounded ${
+                                            appointment.status.keyMap === 'S3' || appointment.status.keyMap === 'S4'
+                                                ? 'bg-blue-200 text-gray-500 cursor-not-allowed'
+                                                : 'bg-blue-500 text-white'
+                                        }`}
+                                        onClick={() => updateStatus(appointment.bookingId, 'S3')}
+                                        disabled={
+                                            appointment.status.keyMap === 'S3' || appointment.status.keyMap === 'S4'
+                                        }
+                                    >
+                                        Hoàn thành
+                                    </button>
+                                    <button
+                                        className={`p-1 rounded ${
+                                            appointment.status.keyMap === 'S3' || appointment.status.keyMap === 'S4'
+                                                ? 'bg-red-200 text-gray-500 cursor-not-allowed'
+                                                : 'bg-red-500 text-white'
+                                        }`}
+                                        onClick={() => updateStatus(appointment.bookingId, 'S4')}
+                                        disabled={
+                                            appointment.status.keyMap === 'S3' || appointment.status.keyMap === 'S4'
+                                        }
+                                    >
+                                        Hủy
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
                 </tbody>
             </table>
         </div>
