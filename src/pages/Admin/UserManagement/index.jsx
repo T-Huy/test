@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef,useContext } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHospital, faGauge, faClock, faPlus, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import { IoMenu } from "react-icons/io5";
 import { UserContext } from "~/context/UserContext";
+import { axiosInstance } from '~/api/apiRequest';
 const UserManagement = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -11,27 +12,161 @@ const UserManagement = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const { logout } = useContext(UserContext);
+  const [selectedFile, setSelectedFile] = useState({});
+  const [previewImage, setPreviewImage] = useState({});
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [filterValue, setFilterValue] = useState('');
+  const [pagination, setPagination] = useState({ page: 1, limit: 6, totalPages: 1 });
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await filterUserAPI();
+    };
+    fetchData();
+  }, [pagination, filterValue]);
+
   const [user, setUser] = useState({
-    name: "",
+    userId: "",
+    fullname: "",
     email: "",
     address: "",
-    phone: "",
+    birthDate: "",
+    phoneNumber: "",
     password: "",
     image: null,
-    role: "",
+    roleId: "",
     gender: "",
   });
 
   const [updateUser, setUpdateUser] = useState({
-    name: "Huy",
-    email: "lthuy@gmail.com",
-    address: "Bình Định",
-    phone: "0987654321",
-    password: "123456",
-    role: "R3",
-    image: "https://s3.ap-southeast-1.amazonaws.com/cdn.vntre.vn/default/meme-meo-khoc-5-1725388333.jpg",
+    userId: "",
+    fullname: "",
+    email: "",
+    address: "",
+    birthDate: "",
+    phoneNumber: "",
+    password: "",
+    roleId: "",
+    image: "",
     gender: "",
   });
+
+  const [deleteUser, setDeleteUser] = useState({
+    userId: ''
+  })
+
+  const createUserAPI = async (formData) => {
+    try {
+      const response = await axiosInstance.post('/user', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (response.status === "OK") {
+        // Xử lý khi tạo thành công
+        await filterUserAPI();
+      } else {
+        console.error('Failed to create user:', response.message);
+      }
+    } catch (error) {
+      console.error('Error creating user:', error);
+    }
+  };
+  const updateUserAPI = async (formData) => {
+    try {
+      const response = await axiosInstance.put(`/user/${updateUser.userId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      if (response.status === "OK") {
+        // Xử lý khi thành công
+        await filterUserAPI();
+      } else {
+        console.error('Failed to update user:', response.message);
+      }
+    } catch (error) {
+      console.error('Error update user:', error);
+    }
+  };
+  const getDetailUserAPI = async (userId) => {
+    setIsUpdateModalOpen(true)
+    setUpdateUser({ ...updateUser, userId: userId });
+    try {
+      const response = await axiosInstance.get(`/user/${userId}`);
+
+      if (response.status === "OK") {
+        // Xử lý khi thành công
+        setUpdateUser({
+          userId: userId,
+          fullname: response.data?.fullname || "",
+          email: response.data?.email || "",
+          address: response.data?.address || "",
+          birthDate: response.data?.birthDate || "",
+          phoneNumber: response.data?.phoneNumber || "",
+          password: response.data?.password || "",
+          roleId: response.data?.roleId || "",
+          image: response.data?.image || "",
+          gender: response.data?.gender || "",
+        })
+      } else {
+        console.error('Failed to get detail user:', response.message);
+      }
+    } catch (error) {
+      console.error('Error get detail user:', error);
+    }
+  };
+  const deleteUserAPI = async (userId) => {
+    try {
+      const response = await axiosInstance.delete(`/user/${userId}`);
+      if (response.status === "OK") {
+        // Xử lý khi thành công
+        await filterUserAPI();
+      } else {
+        console.error('Failed to delete user:', response.message);
+      }
+    } catch (error) {
+      console.error('Error delete user:', error);
+    }
+  };
+
+  const filterUserAPI = async () => {
+    try {
+      const response = await axiosInstance.get(`/user/?query=${filterValue}&page=${pagination.page}&limit=${pagination.limit}`);
+      //console.log(response)
+      if (response.status === 'OK') {
+        //console.log('Fetched users:', response.data.data);
+        setUsers(response.data);
+        if(response.totalPages === 0){
+          response.totalPages = 1
+        }
+        if (pagination.totalPages !== response.totalPages) {
+          setPagination((prev) => ({
+            ...prev,
+            page: 1,
+            totalPages: response.totalPages,
+          }));
+        }
+      } else {
+        console.error('No users are found:', response.message);
+        setUsers([])
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setUsers([])
+    }
+  };
+
+  // Chuyển trang
+  const handlePageChange = async (newPage) => {
+    if (newPage > 0 && newPage <= pagination.totalPages) {
+      setPagination((prev) => ({ ...prev, page: newPage }));
+    }
+  };
+  //Đổi số lượng (limit)
+  const handleLimitChange = async (e) => {
+    const newLimit = parseInt(e.target.value, 10)
+    setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
+  };
 
   const handleBlur = (e) => {
     const { name, value } = e.target;
@@ -52,9 +187,24 @@ const UserManagement = () => {
     }
   };
 
+  const handleDeleteClick = (userId) => {
+    setShowConfirm(true);
+    setDeleteUser({ userId: userId })
+  };
+
+  const handleCancelDelete = () => {
+    setShowConfirm(false);
+    setDeleteUser({ userId: '' })
+  };
+
+  const handleConfirmDelete = () => {
+    deleteUserAPI(deleteUser.userId); // Gọi hàm xóa bệnh viện từ props hoặc API
+    setShowConfirm(false); // Ẩn hộp thoại sau khi xóa
+  };
+
   const handleLogout = () => {
     logout();
-};
+  };
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -64,13 +214,13 @@ const UserManagement = () => {
     setValidationErrors({});
     setIsModalOpen(false);
     setUser({
-      name: "",
+      fullname: "",
       email: "",
       address: "",
-      phone: "",
+      phoneNumber: "",
       password: "",
       image: null,
-      role: "",
+      roleId: "",
       gender: "",
     });
   };
@@ -82,80 +232,111 @@ const UserManagement = () => {
   const handleCloseUpdateModal = () => {
     setValidationErrors({});
     setIsUpdateModalOpen(false);
+    setPreviewImage({image: ""})
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value });
+    setValidationErrors({ ...validationErrors, [name]: '' });
   };
 
   const handleUpdateChange = (e) => {
     const { name, value } = e.target;
     setUpdateUser({ ...updateUser, [name]: value });
+    setValidationErrors({ ...validationErrors, [name]: '' });
   };
 
   const imageInputRef = useRef(null); // Khai báo ref cho input file
 
   const handleImageUpload = (e) => {
-    //setUser({ ...user, image: e.target.files[0] });
     //url tạm thời
     const file = e.target.files[0];
     if (file) {
       const objectURL = URL.createObjectURL(file);
       setUser({ ...user, image: objectURL }); // Lưu blob URL
+      // Xóa lỗi nếu có hình ảnh
+      setValidationErrors((prevErrors) => ({
+        ...prevErrors,
+        image: '', // Xóa thông báo lỗi khi có hình ảnh hợp lệ
+      }));
     }
+    setSelectedFile(file)
   };
 
   const handleUpdateImageUpload = (e) => {
-    //setUser({ ...user, image: e.target.files[0] });
 
     //url tạm thời
     const file = e.target.files[0];
     if (file) {
       const objectURL = URL.createObjectURL(file);
-      setUpdateUser({ ...updateUser, image: objectURL }); // Lưu blob URL
+      setPreviewImage({ image: objectURL }); // Lưu blob URL
     }
-    //base64
+    setSelectedFile(file)
   };
 
   const handleAddUser = () => {
     const errors = {};
-    if (!user.name) errors.name = "Tên người dùng không được để trống.";
+    if (!user.fullname) errors.fullname = "Tên người dùng không được để trống.";
     if (!user.email) errors.email = "Email không được để trống.";
+    if (!user.image) errors.image = "Hình ảnh không được để trống.";
     if (!user.address) errors.address = "Địa chỉ không được để trống.";
-    if (!user.phone) errors.phone = "Số điện thoại không được để trống.";
+    if (!user.birthDate) errors.birthDate = "Ngày sinh không được để trống.";
+    if (!user.phoneNumber) errors.phoneNumber = "Số điện thoại không được để trống.";
     if (!user.password) errors.password = "Mật khẩu không được để trống.";
-    if (!user.role) errors.role = "Vai trò không được để trống.";
+    if (!user.roleId) errors.roleId = "Vai trò không được để trống.";
     if (!user.gender) errors.gender = "Giới tính không được để trống.";
 
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors); // Cập nhật lỗi
       return; // Ngăn không thêm nếu có lỗi
     }
+    const formData = new FormData();
+    // Thêm các trường từ user vào FormData
+    Object.keys(user).forEach((key) => {
+      formData.append(key, user[key]);
+    });
 
+    // Thêm file (nếu có)
+    if (selectedFile && selectedFile.name) {
+      formData.append('image', selectedFile);
+    }
+    createUserAPI(formData)
     alert("Thêm tài khoản thành công!");
     setValidationErrors(errors);
+    setSelectedFile(null)
     console.log("New User Info:", user);
     handleCloseModal();
   };
 
   const handleUpdateUser = () => {
     const errors = {};
-    if (!updateUser.name) errors.name = "Tên người dùng không được để trống.";
+    if (!updateUser.fullname) errors.fullname = "Tên người dùng không được để trống.";
     //if (!user.email) errors.email = "Email không được để trống.";
     if (!updateUser.address) errors.address = "Địa chỉ không được để trống.";
-    if (!updateUser.phone) errors.phone = "Số điện thoại không được để trống.";
+    if (!updateUser.phoneNumber) errors.phoneNumber = "Số điện thoại không được để trống.";
     if (!updateUser.password) errors.password = "Mật khẩu không được để trống.";
-    if (!updateUser.role) errors.role = "Vai trò không được để trống.";
+    if (!updateUser.roleId) errors.roleId = "Vai trò không được để trống.";
     if (!updateUser.gender) errors.gender = "Giới tính không được để trống.";
 
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors); // Cập nhật lỗi
       return; // Ngăn không thêm nếu có lỗi
     }
+    const formData = new FormData();
+    // Thêm các trường từ clinic vào FormData
+    Object.keys(updateUser).forEach((key) => {
+      formData.append(key, updateUser[key]);
+    });
+    // Thêm file (nếu có)
+    if (selectedFile && selectedFile.name) {
+      formData.append('image', selectedFile);
+    }
+    updateUserAPI(formData);
 
     alert("Cập nhật tài khoản thành công!");
     setValidationErrors(errors);
+    setSelectedFile(null);
     console.log("Updated User Info:", updateUser);
     handleCloseUpdateModal();
   };
@@ -321,11 +502,11 @@ const UserManagement = () => {
               <input
                 type="text"
                 placeholder="Tìm kiếm"
+                value={filterValue}
+                onChange={(e) => setFilterValue(e.target.value)}
                 className="border border-gray-400 rounded px-3 py-2 w-96"
               />
-              <button className="bg-gray-200 border border-gray-400 px-4 py-2 rounded">
-                🔍
-              </button>
+              <button className="bg-gray-200 border border-gray-400 px-4 py-2 rounded" onClick={() => filterUserAPI()}>🔍</button>
             </div>
 
             {/* Nút Thêm */}
@@ -354,28 +535,58 @@ const UserManagement = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className="border border-gray-300 px-4 py-2 text-center">1</td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto">
-                    <img
-                      src={"https://s3.ap-southeast-1.amazonaws.com/cdn.vntre.vn/default/meme-meo-khoc-5-1725388333.jpg" || "https://via.placeholder.com/150"}
-                      alt="Image"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">Lê Tấn Huy</td>
-                <td className="border border-gray-300 px-4 py-2 text-center">letanhuy2003@gmail.com</td>
-                <td className="border border-gray-300 px-4 py-2 text-center">Bình Định</td>
-                <td className="border border-gray-300 px-4 py-2 text-center">0987654321</td>
-                <td className="border border-gray-300 px-4 py-2 text-center space-x-8">
-                  <button className="text-blue-500" onClick={handleOpenUpdateModal}>✏️</button>
-                  <button className="text-red-500">🗑️</button>
-                </td>
-              </tr>
+              {users.map((user, index) => (
+                <tr key={user.userId}>
+                  <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">
+                    <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto">
+                      <img
+                        src={`http://localhost:9000/uploads/${user.image}`}
+                        alt="No Image"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">{user.fullname}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">{user.email}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">{user.address}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-center">{user.phoneNumber}</td>
+                  <td className="border border-gray-300 px-4 py-2 text-center space-x-8">
+                    <button className="text-blue-500" onClick={() => getDetailUserAPI(user.userId)}>✏️</button>
+                    <button className="text-red-500" onClick={() => handleDeleteClick(user.userId)}>🗑️</button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
+          {/* Điều hướng phân trang */}
+          <div className="flex justify-end items-center space-x-4 mt-4">
+            <select className="border border-gray-400"
+              name="number"
+              value={pagination.limit}
+              onChange={handleLimitChange}
+            >
+              <option value="6">6</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+          </div>
+          <div className="flex justify-end items-center space-x-4 mt-4">
+            <button className={`${pagination.page === 1 ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+              onClick={() => handlePageChange(pagination.page - 1)}
+              disabled={pagination.page === 1}>
+              Previous
+            </button>
+            <span>
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            <button className={`${pagination.page === pagination.totalPages ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+              onClick={() => handlePageChange(pagination.page + 1)}
+              disabled={pagination.page === pagination.totalPages}
+            >
+              Next
+            </button>
+          </div>
 
           {/* Modal Thêm tài khoản*/}
           {isModalOpen && (
@@ -432,15 +643,15 @@ const UserManagement = () => {
                   </div>
                   {/* Cột bên phải: Hình ảnh và nút "Thay đổi" */}
                   <div className="flex flex-col items-center space-x-12">
-                    <label>Hình ảnh</label>
+                    <label>Hình ảnh<span className="text-red-500">*</span></label>
                     <div className="flex items-center gap-4">
                       <div
                         className="w-40 h-40 border rounded overflow-hidden cursor-pointer flex items-center justify-center"
                         onClick={() => imageInputRef.current.click()}
                       >
                         <img
-                          src={user.image || "https://via.placeholder.com/150"}
-                          alt="Current User"
+                          src={user.image}
+                          alt="No Image"
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -452,38 +663,56 @@ const UserManagement = () => {
                         ref={imageInputRef}  // Sử dụng ref để trigger khi cần
                       />
                     </div>
+                    {validationErrors.image && (
+                      <p className="text-red-500 text-sm">{validationErrors.image}</p>
+                    )}
                   </div>
                   <div>
                     <label>Tên tài khoản<span className="text-red-500">*</span></label>
                     <input
                       type="text"
-                      name="name"
-                      value={user.name}
+                      name="fullname"
+                      value={user.fullname}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`border w-full px-2 py-1 rounded ${validationErrors.name ? "border-red-500" : "border-gray-400"
+                      className={`border w-full px-2 py-1 rounded ${validationErrors.fullname ? "border-red-500" : "border-gray-400"
                         }`}
                     />
-                    {validationErrors.name && (
-                      <p className="text-red-500 text-sm">{validationErrors.name}</p>
+                    {validationErrors.fullname && (
+                      <p className="text-red-500 text-sm">{validationErrors.fullname}</p>
                     )}
                   </div>
                   <div>
                     <label>Số điện thoại<span className="text-red-500">*</span></label>
                     <input
                       type="text"
-                      name="phone"
-                      value={user.phone}
+                      name="phoneNumber"
+                      value={user.phoneNumber}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`border w-full px-2 py-1 rounded ${validationErrors.phone ? "border-red-500" : "border-gray-400"
+                      className={`border w-full px-2 py-1 rounded ${validationErrors.phoneNumber ? "border-red-500" : "border-gray-400"
                         }`}
                     />
-                    {validationErrors.phone && (
-                      <p className="text-red-500 text-sm">{validationErrors.phone}</p>
+                    {validationErrors.phoneNumber && (
+                      <p className="text-red-500 text-sm">{validationErrors.phoneNumber}</p>
                     )}
                   </div>
-                  <div className="col-span-2">
+                  <div>
+                    <label>Ngày sinh<span className="text-red-500">*</span></label>
+                    <input
+                      type="date"
+                      name="birthDate"
+                      value={user.birthDate}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      className={`border w-full px-2 py-1 rounded ${validationErrors.birthDate ? "border-red-500" : "border-gray-400"
+                        }`}
+                    />
+                    {validationErrors.birthDate && (
+                      <p className="text-red-500 text-sm">{validationErrors.birthDate}</p>
+                    )}
+                  </div>
+                  <div>
                     <label>Địa chỉ<span className="text-red-500">*</span></label>
                     <input
                       type="text"
@@ -522,11 +751,11 @@ const UserManagement = () => {
                     <label>Vai trò<span className="text-red-500">*</span></label>
                     <select
                       type="text"
-                      name="role"
-                      value={user.role}
+                      name="roleId"
+                      value={user.roleId}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className={`border w-full px-2 py-1 rounded ${validationErrors.role ? "border-red-500" : "border-gray-400"
+                      className={`border w-full px-2 py-1 rounded ${validationErrors.roleId ? "border-red-500" : "border-gray-400"
                         }`}
                     >
                       <option value="">Chọn vai trò</option>
@@ -534,8 +763,8 @@ const UserManagement = () => {
                       <option value="R2">Bác sĩ</option>
                       <option value="R3">Người dùng</option>
                     </select>
-                    {validationErrors.role && (
-                      <p className="text-red-500 text-sm">{validationErrors.role}</p>
+                    {validationErrors.roleId && (
+                      <p className="text-red-500 text-sm">{validationErrors.roleId}</p>
                     )}
                   </div>
                   <div className="col-span-2 flex justify-end">
@@ -608,8 +837,8 @@ const UserManagement = () => {
                         onClick={() => imageInputRef.current.click()}
                       >
                         <img
-                          src={updateUser.image || "https://via.placeholder.com/150"}
-                          alt="Current User"
+                          src={previewImage.image ? previewImage.image : `http://localhost:9000/uploads/${updateUser.image}`}
+                          alt="No Image"
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -626,33 +855,48 @@ const UserManagement = () => {
                     <label>Tên tài khoản</label>
                     <input
                       type="text"
-                      name="name"
-                      value={updateUser.name}
+                      name="fullname"
+                      value={updateUser.fullname}
                       onChange={handleUpdateChange}
                       onBlur={handleBlur}
-                      className={`border w-full px-2 py-1 rounded ${validationErrors.name ? "border-red-500" : "border-gray-400"
+                      className={`border w-full px-2 py-1 rounded ${validationErrors.fullname ? "border-red-500" : "border-gray-400"
                         }`}
                     />
-                    {validationErrors.name && (
-                      <p className="text-red-500 text-sm">{validationErrors.name}</p>
+                    {validationErrors.fullname && (
+                      <p className="text-red-500 text-sm">{validationErrors.fullname}</p>
                     )}
                   </div>
                   <div>
                     <label>Số điện thoại</label>
                     <input
                       type="text"
-                      name="phone"
-                      value={updateUser.phone}
+                      name="phoneNumber"
+                      value={updateUser.phoneNumber}
                       onChange={handleUpdateChange}
                       onBlur={handleBlur}
-                      className={`border w-full px-2 py-1 rounded ${validationErrors.phone ? "border-red-500" : "border-gray-400"
+                      className={`border w-full px-2 py-1 rounded ${validationErrors.phoneNumber ? "border-red-500" : "border-gray-400"
                         }`}
                     />
-                    {validationErrors.phone && (
-                      <p className="text-red-500 text-sm">{validationErrors.phone}</p>
+                    {validationErrors.phoneNumber && (
+                      <p className="text-red-500 text-sm">{validationErrors.phoneNumber}</p>
                     )}
                   </div>
-                  <div className="col-span-2">
+                  <div>
+                    <label>Ngày sinh</label>
+                    <input
+                      type="date"
+                      name="birthDate"
+                      value={updateUser.birthDate}
+                      onChange={handleUpdateChange}
+                      onBlur={handleBlur}
+                      className={`border w-full px-2 py-1 rounded ${validationErrors.birthDate ? "border-red-500" : "border-gray-400"
+                        }`}
+                    />
+                    {validationErrors.birthDate && (
+                      <p className="text-red-500 text-sm">{validationErrors.birthDate}</p>
+                    )}
+                  </div>
+                  <div>
                     <label>Địa chỉ</label>
                     <input
                       type="text"
@@ -691,11 +935,11 @@ const UserManagement = () => {
                     <label>Vai trò</label>
                     <select
                       type="text"
-                      name="role"
-                      value={updateUser.role}
+                      name="roleId"
+                      value={updateUser.roleId}
                       onChange={handleUpdateChange}
                       onBlur={handleBlur}
-                      className={`border w-full px-2 py-1 rounded ${validationErrors.role ? "border-red-500" : "border-gray-400"
+                      className={`border w-full px-2 py-1 rounded ${validationErrors.roleId ? "border-red-500" : "border-gray-400"
                         }`}
                     >
                       <option value="">Chọn vai trò</option>
@@ -703,8 +947,8 @@ const UserManagement = () => {
                       <option value="R2">Bác sĩ</option>
                       <option value="R3">Người dùng</option>
                     </select>
-                    {validationErrors.role && (
-                      <p className="text-red-500 text-sm">{validationErrors.role}</p>
+                    {validationErrors.roleId && (
+                      <p className="text-red-500 text-sm">{validationErrors.roleId}</p>
                     )}
                   </div>
                   <div className="col-span-2 flex justify-end">
@@ -715,6 +959,26 @@ const UserManagement = () => {
                       Cập nhật
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Hộp thoại xác nhận */}
+          {showConfirm && (
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+              <div className="bg-white p-6 rounded shadow-lg">
+                <h3 className="text-lg font-semibold mb-4">Xác nhận xóa tài khoản</h3>
+                <p>Bạn có chắc chắn muốn xóa tài khoản này?</p>
+                <div className="mt-4 flex justify-end gap-4">
+                  <button onClick={handleCancelDelete} className="px-4 py-2 bg-gray-500 text-white rounded">
+                    Hủy
+                  </button>
+                  <button
+                    onClick={handleConfirmDelete}
+                    className="px-4 py-2 bg-red-500 text-white rounded"
+                  >
+                    Xóa
+                  </button>
                 </div>
               </div>
             </div>
