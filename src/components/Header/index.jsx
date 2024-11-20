@@ -50,7 +50,7 @@ function Header() {
     return (
         <header className="bg-transparent shadow fixed top-0 left-0 right-0 z-50">
             <div className="absolute inset-0 backdrop-blur-md bg-white/30"></div>
-            <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-20">
                     {/* Logo */}
                     <NavLink to="/" className="flex-shrink-0 flex items-center mr-auto">
