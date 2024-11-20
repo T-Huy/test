@@ -46,9 +46,6 @@ function Specialties() {
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-5xl font-bold text-gray-800">Chọn chuyên khoa</h1>
-                <button className="text-gray-500 hover:text-gray-700">
-                    <X className="w-6 h-6" />
-                </button>
             </div>
 
             {/* Search Bar */}
@@ -67,19 +64,19 @@ function Specialties() {
             <div className="space-y-6">
                 {filteredDepartments.map((dept) => (
                     <button
-                        className="w-full flex items-start gap-4 p-4 bg-white rounded-lg shadow-lg hover:shadow-md transition-shadow text-left"
+                        className="w-full flex items-center gap-4 p-4 bg-white rounded-lg shadow-lg hover:shadow-2xl transition-shadow text-left"
                         onClick={() => handleGetSpecialty(dept.specialtyId, dept.name)}
                     >
                         <img
                             src={`http://localhost:${import.meta.env.VITE_BE_PORT}/uploads/${dept.image}`}
-                            alt={'logo'}
-                            className="w-24 h-24 object-cover rounded-lg"
+                            alt={dept.name}
+                            className="w-36 h-36 object-cover rounded-full"
                         />
                         <div>
                             <h3 className="text-blue-400 font-medium mb-2 text-3xl">{dept.name}</h3>
-                            <div className="flex items-start gap-2 text-gray-600 text-2xl">
+                            {/* <div className="flex items-start gap-2 text-gray-600 text-2xl">
                                 <span>{dept.description}</span>
-                            </div>
+                            </div> */}
                         </div>
                     </button>
                 ))}

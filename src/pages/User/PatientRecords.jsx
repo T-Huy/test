@@ -94,7 +94,7 @@ function PatientRecord() {
                 {patientData.map((patient) => (
                     <div
                         key={patient.patientRecordId}
-                        className="bg-white shadow-xl rounded-lg overflow-hidden p-4 w-[650px] border-spacing-3 mt-4"
+                        className="bg-white shadow-xl border rounded-lg overflow-hidden p-4 w-[650px] border-spacing-3 mt-4"
                     >
                         <div className="space-y-4">
                             <div className="flex gap-1 relative top-5">

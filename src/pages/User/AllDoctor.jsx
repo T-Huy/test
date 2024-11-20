@@ -3,6 +3,10 @@ import { MapPin, Search, Clock, DollarSign } from 'lucide-react';
 import axios from 'axios';
 import { axiosInstance } from '~/api/apiRequest';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { LiaStethoscopeSolid } from 'react-icons/lia';
+import { BsCoin } from 'react-icons/bs';
+import { CiHospital1 } from 'react-icons/ci';
+import { GrLocation } from 'react-icons/gr';
 
 function AllDoctor() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -49,6 +53,18 @@ function AllDoctor() {
         navigate(`/bac-si/get?id=${doctorId}`);
     };
 
+    const positions = ['P0', 'P1', 'P2']; // Mảng các giá trị cần so sánh
+
+    const getPositionLabel = (position) => {
+        if (position === 'P0') {
+            return 'Bác sĩ';
+        } else if (positions.includes(position)) {
+            return 'Chức danh khác'; // Thay thế bằng nhãn phù hợp cho các giá trị khác trong mảng
+        } else {
+            return position; // Giá trị mặc định nếu không khớp với bất kỳ giá trị nào trong mảng
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto p-6 mt-28">
             {/* Header Section */}
@@ -71,7 +87,7 @@ function AllDoctor() {
                     <input
                         type="text"
                         placeholder="Tìm kiếm bác sĩ"
-                        className="w-full pl-16 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-16 pr-4 py-2 border rounded-full focus:ring-2 focus:ring-blue-500"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -79,42 +95,52 @@ function AllDoctor() {
             </div>
 
             {/* Doctors List */}
-            <div className="grid grid-cols-1 gap-4 mb-8">
+            <div>
                 {filteredDoctors.map((doctor) => (
                     <div
                         key={doctor._id}
-                        className="flex gap-4 p-6 border rounded-lg hover:shadow-lg transition-shadow"
+                        className="flex justify-center items-center gap-4 p-6 mb-6 border rounded-lg hover:shadow-lg transition-shadow"
                     >
                         <img
                             src={`${IMAGE_URL}${doctor.doctorId.image}`}
                             alt={doctor.doctorId.fullname}
-                            className="w-20 h-20 rounded-lg object-cover"
+                            className="w-36 h-36 rounded-full object-cover"
                         />
                         <div className="flex-1">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h3 className="font-bold text-blue-600 text-3xl">{doctor.doctorId.fullname}</h3>
-                                    <p className="text-2xl text-gray-500">{doctor.specialtyId.name}</p>
+                            <div className="flex justify-between flex-col items-start">
+                                <div className="flex gap-2">
+                                    <h4 className="font-bold text-blue-600 text-3xl">
+                                        {getPositionLabel(doctor.position)}
+                                    </h4>
+                                    <h4 className="font-semibold text-blue-600 text-3xl">{doctor.doctorId.fullname}</h4>
                                 </div>
-                                <button
-                                    className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600"
-                                    onClick={() => handleBooking(doctor.doctorId.userId)}
-                                >
-                                    Đặt ngay
-                                </button>
+
+                                <div className="mt-2  gap-4 text-2xl">
+                                    <div className="flex items-start gap-2">
+                                        <LiaStethoscopeSolid className="mt-1" />
+                                        {doctor.specialtyId.name}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <BsCoin className="mt-1" />
+                                        <span>{formatCurrency(doctor.price)}</span>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <CiHospital1 className="mt-1" />
+                                        <span>{doctor.clinicId.name}</span>
+                                    </div>
+                                    <div className="flex items-start gap-2">
+                                        <GrLocation className="mt-1" />
+                                        <span>{doctor.clinicId.address}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="mt-2 grid grid-cols-3 gap-4 text-2xl">
-                                <div className="flex items-center gap-1">
-                                    <DollarSign className="w-4 h-4 text-gray-400" />
-                                    <span>{formatCurrency(doctor.price)}</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <MapPin className="w-4 h-4 text-gray-400" />
-                                    <span>{doctor.clinicId.name}</span>
-                                </div>
-                            </div>
-                            <p className="mt-3 text-xl text-gray-500">{doctor.clinicId.address}</p>
                         </div>
+                        <button
+                            className="px-6 py-2 mr-8 font-semibold bg-blue-500 text-white rounded-3xl hover:bg-blue-600"
+                            onClick={() => handleBooking(doctor.doctorId.userId)}
+                        >
+                            Đặt ngay
+                        </button>
                     </div>
                 ))}
             </div>

@@ -532,9 +532,9 @@ const WorktimeManagement = () => {
               <tr>
                 <th className="border border-gray-300 px-4 py-2">STT</th>
                 <th className="border border-gray-300 px-4 py-2">Tên bác sĩ</th>
-                <th className="border border-gray-300 px-4 py-2">Ngày khám</th>
+                <th className="border border-gray-300 px-4 py-2 min-w-48">Ngày khám</th>
                 <th className="border border-gray-300 px-4 py-2">Ca khám</th>
-                <th className="border border-gray-300 px-4 py-2">Thao tác</th>
+                <th className="border border-gray-300 px-4 py-2 min-w-24">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -557,8 +557,8 @@ const WorktimeManagement = () => {
                       ))}
                     </div>
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-center space-x-8">
-                    <button className="text-blue-500 hover:text-blue-700" onClick={() => getDetailWorkTimeAPI(item.doctorId.userId, item.scheduleDate)}>✏️</button>
+                  <td className="border border-gray-300 px-4 py-2 text-center">
+                    <button className="text-blue-500 hover:text-blue-700 mr-2" onClick={() => getDetailWorkTimeAPI(item.doctorId.userId, item.scheduleDate)}>✏️</button>
                     <button className="text-red-500 hover:text-red-700" onClick={() => handleDeleteClick(item.doctorId.userId, item.scheduleDate)}>🗑️</button>
                   </td>
                 </tr>
