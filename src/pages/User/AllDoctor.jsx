@@ -2,17 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { MapPin, Search, Clock, DollarSign } from 'lucide-react';
 import axios from 'axios';
 import { axiosInstance } from '~/api/apiRequest';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function AllDoctor() {
     const [searchQuery, setSearchQuery] = useState('');
     const [doctors, setDoctors] = useState([]);
     const navigate = useNavigate();
 
+    const { state } = useLocation();
+
+    console.log('STATEEEE', state);
+
+    const getClinicId = state.clinicId || '';
+    const getSpecialtyId = state.specialtyId || '';
+
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
-                const response = await axiosInstance.get('/doctor');
+                const response = await axiosInstance.get(
+                    `/doctor?clinicId=${getClinicId}&specialtyId=${getSpecialtyId}`,
+                );
                 console.log('response:', response);
                 if (response.errCode === 0) {
                     setDoctors(response.data);

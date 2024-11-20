@@ -11,6 +11,7 @@ function ConfirmInfomation() {
     console.log('STATEEE', state);
     const [reason, setReason] = useState('');
     const [patientData, setPatientData] = useState([]);
+    const navigate = useNavigate();
 
     const timeSlots = [
         { label: '8:00 - 9:00', value: 'T1' },
@@ -48,7 +49,34 @@ function ConfirmInfomation() {
 
     console.log('REASON', reason);
 
-    const handleConfirm = async () => {
+    const handlePaymentDirect = async () => {
+        try {
+            const payload = {
+                doctorId: state.patientState.doctorId,
+                patientRecordId: state.patientId,
+                appointmentDate: state.patientState.currentDate,
+                timeType: state.patientState.timeSlot,
+                price: doctorInfo.price,
+                reason: reason || '',
+            };
+
+            const response = await axiosInstance.post('/booking/book-appointment-direct', payload);
+
+            console.log('Response', response);
+
+            if (response.status === 'OK') {
+                toast.success('Đặt lịch thành công!');
+                navigate('/user/appointments');
+            } else {
+                toast.error(response.data.message || 'Đặt lịch thất bại!');
+            }
+        } catch (error) {
+            console.error('Failed to confirm booking:', error.message);
+            toast.error('Đã xảy ra lỗi khi đặt lịch!');
+        }
+    };
+
+    const handlePaymentOnline = async () => {
         try {
             const payload = {
                 doctorId: state.patientState.doctorId,
@@ -71,9 +99,18 @@ function ConfirmInfomation() {
             }
         } catch (error) {
             console.error('Failed to confirm booking:', error.message);
-            alert('Đã xảy ra lỗi khi đặt lịch!');
+            toast.error('Đã xảy ra lỗi khi đặt lịch!');
         }
     };
+
+    const handleConfirm = () => {
+        if (paymentMethod === 'direct') {
+            handlePaymentDirect();
+        } else if (paymentMethod === 'online') {
+            handlePaymentOnline();
+        }
+    };
+
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
     };
@@ -98,6 +135,10 @@ function ConfirmInfomation() {
         fetchPatientData();
     }, [state.patientId]);
 
+    const [paymentMethod, setPaymentMethod] = useState('direct'); // Trạng thái lưu trữ phương thức thanh toán
+    const handlePaymentMethodChange = (event) => {
+        setPaymentMethod(event.target.value);
+    };
     return (
         <div className="max-w-fit mx-auto p-4 space-y-4 mt-32">
             <h1 className="text-5xl font-bold text-blue-600 mb-2 text-center">Xác nhận thông tin</h1>
@@ -212,10 +253,48 @@ function ConfirmInfomation() {
                     </div>
                 </div>
             </div>
+
+            <div className="bg-white rounded-lg shadow-md">
+                <div className="bg-blue-400 text-white p-3 rounded-t-lg">
+                    <h2 className="font-medium">Phương thức thanh toán</h2>
+                </div>
+                <div className="p-4">
+                    <div className="grid grid-cols-1  gap-4">
+                        <div className="flex items-center">
+                            <input
+                                type="radio"
+                                id="direct"
+                                name="paymentMethod"
+                                value="direct"
+                                checked={paymentMethod === 'direct'}
+                                onChange={handlePaymentMethodChange}
+                                className="mr-2"
+                            />
+                            <label htmlFor="direct" className="font-medium">
+                                Thanh toán trực tiếp
+                            </label>
+                        </div>
+                        <div className="flex items-center">
+                            <input
+                                type="radio"
+                                id="online"
+                                name="paymentMethod"
+                                value="online"
+                                checked={paymentMethod === 'online'}
+                                onChange={handlePaymentMethodChange}
+                                className="mr-2"
+                            />
+                            <label htmlFor="online" className="font-medium">
+                                Thanh toán online
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {/* Confirm Button */}
             <div className="flex justify-end mt-20 ">
                 <button className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600" onClick={handleConfirm}>
-                    Thanh toán
+                    Xác nhận
                 </button>
             </div>
         </div>
