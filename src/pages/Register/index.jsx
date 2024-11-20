@@ -1,80 +1,214 @@
-import { useState } from 'react';
+import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { axiosClient } from '~/api/apiRequest';
+import { useOtpToken } from '~/context/OTPContext';
 function Register() {
-    const [fullName, setFullName] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const [fullname, setFullname] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleRegister = (e) => {
-        e.preventDefault();
-        console.log('Full Name:', fullName);
-        console.log('Email:', email);
-        console.log('Password:', password);
+    const [fullnameError, setFullnameError] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
+    const inputFocus = useRef(null);
+    const {setEmailRegister,setOtpToken} = useOtpToken();
+    
+
+    useEffect(() => {
+        if (inputFocus.current) {
+            inputFocus.current.focus();
+        }
+    }, []);
+    const navigate = useNavigate();
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const toggleShowConfirmPassword = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+    };
+
+    const handleFullNameChange = (e) => {
+        setFullname(e.target.value);
+        setFullnameError('');
+    };
+
+    const handleFullnameBlur = () => {
+        if (!fullname) {
+            setFullnameError('Họ và tên không được để trống.');
+        }
+    };
+
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value);
+        setEmailError('');
+    };
+
+    const handleEmailBlur = () => {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email) {
+            setEmailError('Email không được để trống.');
+        } else if (!emailPattern.test(email)) {
+            setEmailError('Email không đúng định dạng.');
+        }
     };
 
     const handlePasswordChange = (e) => {
-        const inputValue = e.target.value;
+        setPassword(e.target.value);
+        setPasswordError('');
+    };
 
-        setPassword(inputValue);
+    const handlePasswordBlur = () => {
+        if (!password) {
+            setPasswordError('Password không được để trống.');
+        }
+    };
+
+    const handleConfirmPasswordChange = (e) => {
+        setConfirmPassword(e.target.value);
+        setConfirmPasswordError('');
+    };
+    const handleConfirmPasswordBlur = () => {
+        if (!confirmPassword) {
+            setConfirmPasswordError('Xác nhận password không được để trống.');
+        } else if (password !== confirmPassword) {
+            setConfirmPasswordError('Mật khẩu không khớp. Vui lòng thử lại.');
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axiosClient.post('/sign-up', {
+                fullname,
+                email,
+                password,
+            });
+            console.log(response);
+
+            if (response.status === 'OK') {
+                setEmailRegister(email);
+                setOtpToken(response.otp_token);
+                toast.success("OTP đã được gửi về email");
+                setTimeout(() => {
+                    navigate('/confirm-otp');
+                }, 2000);
+            } else {
+                toast.error(`${response.message}`);
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Đăng kí không thành công");
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSubmit(e);
+        }
     };
 
     return (
-        <div className="wrappperr flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="flex w-full max-w-6xl bg-white rounded-lg shadow-lg">
-                {/* Bên trái - Hình ảnh */}
-                <div className="hidden md:block md:w-1/2">
-                    <img
-                        src="https://via.placeholder.com/400"
-                        alt="Register"
-                        className="object-cover w-full h-full rounded-l-lg"
-                    />
+        <div className="flex items-center justify-center min-h-screen bg-[#e9ebee]">
+            <div className="w-full max-w-xl p-8 bg-white shadow-xl border rounded-2xl">
+                <div className="mb-6">
+                    <h3 className="text-4xl font-bold text-gray-800 text-center">Đăng kí</h3>
                 </div>
-                {/* Bên phải - Form đăng ký */}
-                <div className="w-full md:w-1/2 p-8">
-                    <h2 className="mb-6 text-3xl font-semibold text-center text-gray-800">Đăng ký</h2>
-                    <form onSubmit={handleRegister}>
-                        <div className="mb-4">
+                <div>
+                    <div className="mb-4">
+                        <input
+                            ref={inputFocus}
+                            type="text"
+                            className="w-full !bg-white h-[44px] mt-4 px-3 py-2  border border-gray-300 rounded-xl"
+                            placeholder="Họ và tên"
+                            value={fullname}
+                            onChange={handleFullNameChange}
+                            onBlur={handleFullnameBlur}
+                            onKeyDown={handleKeyDown}
+                        />
+                        {fullnameError && <span className="text-red-500 mt-1 text-xl">{fullnameError}</span>}
+                    </div>
+                    <div className="mb-4">
+                        <input
+                            type="text"
+                            className="w-full !bg-white h-[44px] mt-4 px-3 py-2  border border-gray-300 rounded-xl"
+                            placeholder="Email"
+                            value={email}
+                            onChange={handleEmailChange}
+                            onBlur={handleEmailBlur}
+                            onKeyDown={handleKeyDown}
+                        />
+                        {emailError && <span className="text-red-500 mt-1 text-xl">{emailError}</span>}
+                    </div>
+                    <div className="mb-4 relative">
+                        <div className="relative">
                             <input
-                                type="text"
-                                id="fullName"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
-                                placeholder="Nhập họ tên của bạn"
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <input
-                                type="email"
-                                id="email"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
-                                placeholder="Nhập email của bạn"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-                        <div className="mb-6">
-                            <input
-                                type="password"
-                                id="password"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out"
-                                placeholder="Nhập mật khẩu của bạn"
+                                type={showPassword ? 'text' : 'password'}
+                                className="w-full !bg-white h-[44px] mt-4 pl-3 pr-12 py-2 border  border-gray-300 rounded-xl"
+                                placeholder="Mật khẩu"
                                 value={password}
                                 onChange={handlePasswordChange}
+                                onBlur={handlePasswordBlur}
+                                onKeyDown={handleKeyDown}
                             />
+                            <button
+                                type="button"
+                                className="absolute top-[63%] right-3 transform -translate-y-1/2 text-gray-500 "
+                                onClick={toggleShowPassword}
+                            >
+                                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                            </button>
                         </div>
+                        {passwordError && <span className="text-red-500 mt-1 text-xl">{passwordError}</span>}
+                    </div>
+                    <div className="mb-4 relative">
+                        <div className="relative">
+                            <input
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                className="w-full !bg-white h-[44px] mt-4 pl-3 pr-12 py-2 border  border-gray-300 rounded-xl"
+                                placeholder="Nhập lại mật khẩu"
+                                value={confirmPassword}
+                                onChange={handleConfirmPasswordChange}
+                                onBlur={handleConfirmPasswordBlur}
+                                onKeyDown={handleKeyDown}
+                            />
+                            <button
+                                type="button"
+                                className="absolute top-[63%] right-3 transform -translate-y-1/2 text-gray-500 "
+                                onClick={toggleShowConfirmPassword}
+                            >
+                                <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                            </button>
+                        </div>
+                        {confirmPasswordError && (
+                            <span className="text-red-500 mt-1 text-xl">{confirmPasswordError}</span>
+                        )}
+                    </div>
+                    <div>
                         <button
-                            type="submit"
-                            className="w-full px-4 py-3 font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out"
+                            type="button"
+                            className="w-full text-white font-semibold bg-blue-500 py-3 px-6 rounded-lg hover:bg-blue-600"
+                            onClick={handleSubmit}
                         >
-                            Đăng ký
+                            Đăng kí
                         </button>
-                    </form>
-                    <p className="mt-4 text-center text-gray-600">
-                        Bạn đã có tài khoản?{' '}
-                        <a href="#" className="text-blue-500 font-semibold">
+                    </div>
+                    <div className="text-center my-6">
+                        <span className="text-gray-500">Bạn đã có tài khoản ư?</span>
+                        <NavLink to="/login" className="text-blue-500 ml-1 font-medium">
                             Đăng nhập
-                        </a>
-                    </p>
+                        </NavLink>
+                    </div>
                 </div>
             </div>
         </div>
