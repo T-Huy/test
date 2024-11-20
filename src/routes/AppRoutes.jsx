@@ -12,11 +12,14 @@ import UserProfile from '~/pages/User/UserProfile';
 import PatientRecords from '~/pages/User/PatientRecords';
 import AppointmentManagement from '~/pages/User/AppointmentManagement';
 import UserRoutes from './UserRoutes';
+import ForgotPassword from '~/pages/ForgotPassword';
+import ConfirmOTP from '~/pages/ConfirmOTP';
 import AllDoctor from '~/pages/User/AllDoctor';
 import ChoosePatientRecord from '~/pages/User/ChoosePatientRecords';
 import ConfirmInfomation from '~/pages/User/ConfirmInfomation';
 import ClinicInfo from '~/pages/User/ClinicInfo';
 import Specialties from '~/pages/User/Specialties';
+
 
 function AppRoutes() {
     return (
@@ -24,15 +27,14 @@ function AppRoutes() {
             <Routes>
                 <Route path="/" element={<HomeLayout />}>
                     <Route index element={<Home />} />
-
                     <Route path="/login" element={<Login />} />
+                    <Route path="/forgot-password" element={<ForgotPassword/>}/>
                     <Route path="/register" element={<Register />} />
-
+                    <Route path="/confirm-otp" element={<ConfirmOTP/>}/>
                     <Route path="/bac-si" element={<AllDoctor />} />
                     <Route path="/bac-si/get" element={<DoctorInfo />} />
                     <Route path="/bac-si/get/record" element={<ChoosePatientRecord />} />
                     <Route path="/bac-si/get/record/confirm" element={<ConfirmInfomation />} />
-
                     <Route path="/benh-vien" element={<ClinicInfo />} />
                     <Route path="/benh-vien/chuyen-khoa" element={<Specialties />} />
 
