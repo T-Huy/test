@@ -17,8 +17,13 @@ function AllDoctor() {
 
     console.log('STATEEEE', state);
 
-    const getClinicId = state.clinicId || '';
-    const getSpecialtyId = state.specialtyId || '';
+    let getClinicId = '';
+    let getSpecialtyId = '';
+
+    if (state) {
+        getClinicId = state.clinicId;
+        getSpecialtyId = state.specialtyId;
+    }
 
     useEffect(() => {
         const fetchDoctors = async () => {
