@@ -208,7 +208,7 @@ function DoctorInfo() {
 
             {/* Work History */}
 
-            <div className="doctor-description leading-7 my-6 border w-full p-4">
+            <div className="doctor-description leading-7 my-6 border w-[874px] p-4">
                 {doctorInfo.description ? parse(doctorInfo.description) : 'Mô tả không có sẵn'}
             </div>
         </div>
