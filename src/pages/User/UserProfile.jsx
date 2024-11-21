@@ -35,7 +35,7 @@ function DoctorProfile() {
                         name: response.data.fullname,
                         address: response.data.address,
                         gender: response.data.gender === 'Male' ? 'Nam' : 'Nữ',
-                        birthdate: response.data.birthDate.split('T')[0],
+                        birthdate: response.data.birthDate,
                         specialty: response.data.specialtyName,
                         phone: response.data.phoneNumber,
                         email: response.data.email,
