@@ -119,70 +119,65 @@ const AppointmentManagement = () => {
                             <p>Lý do khám: {appointment.reason}</p>
                             <p>Trạng thái: {appointment.status.valueVi}</p> */}
 
-                            <div className="p-2">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div>
-                                        <h2 className="text-3xl font-bold mt-1 uppercase">
-                                            {appointment.patientRecordId.fullname}
-                                        </h2>
+                            <div className="flex justify-between items-start mb-4">
+                                <div>
+                                    <h2 className="text-3xl font-bold mt-1 uppercase">
+                                        {appointment.patientRecordId.fullname}
+                                    </h2>
+                                </div>
+
+                                <div className="flex">
+                                    <span className="text-red-500 font-bold text-3xl">
+                                        {appointment.status.valueVi}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="mt-6">
+                                <h3 className="flex items-center text-3xl font-semibold text-blue-500 mb-4 uppercase">
+                                    <Stethoscope className="mr-2" size={20} />
+                                    BÁC SĨ {appointment.doctorId.fullname}
+                                </h3>
+
+                                <div className="flex gap-2 relative top-5">
+                                    {/* Cột 1 */}
+                                    <div className="flex flex-col gap-6">
+                                        <div className="flex">
+                                            <span className="mr-2 font-medium">Ngày khám:</span>
+                                            <span>{new Date(appointment.appointmentDate).toLocaleDateString()}</span>
+                                        </div>
+
+                                        <div className="flex">
+                                            <span className="mr-2 font-medium">Giờ khám:</span>
+                                            <span>{appointment.timeType.valueVi}</span>
+                                        </div>
+
+                                        <div className="flex">
+                                            <span className="mr-2 font-medium">Chuyên khoa:</span>
+                                            <span>{appointment.doctorInfo.specialty.name}</span>
+                                        </div>
                                     </div>
 
-                                    <div className="flex">
-                                        <span className="text-red-500 font-bold text-3xl">
-                                            {appointment.status.valueVi}
-                                        </span>
+                                    {/* Cột 2 */}
+                                    <div className="flex-1">
+                                        <div className="flex flex-col gap-[3px]">
+                                            <div className="flex">
+                                                <span className="mr-2 font-medium">Bệnh viện:</span>
+                                                <span>{appointment.doctorInfo.clinic.name}</span>
+                                            </div>
+                                            <div className="flex">
+                                                <span className="mr-2 font-medium whitespace-nowrap">Địa chỉ:</span>
+                                                <span>{appointment.doctorInfo.clinic.address}</span>
+                                            </div>
+                                            <div className="flex">
+                                                <span className="mr-2 font-medium">Lý do khám:</span>
+                                                <span>{appointment.reason}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="mt-6">
-                                    <h3 className="flex items-center text-3xl font-semibold text-blue-500 mb-4 uppercase">
-                                        <Stethoscope className="mr-2" size={20} />
-                                        BÁC SĨ {appointment.doctorId.fullname}
-                                    </h3>
-
-                                    <div className="flex gap-1 relative top-5">
-                                        {/* Cột 1 */}
-                                        <div className="flex-1">
-                                            <div className="space-y-3">
-                                                <div className="flex">
-                                                    <span className="w-48 font-medium">Ngày khám:</span>
-                                                    <span>
-                                                        {new Date(appointment.appointmentDate).toLocaleDateString()}
-                                                    </span>
-                                                </div>
-
-                                                <div className="flex">
-                                                    <span className="w-48 font-medium">Giờ khám:</span>
-                                                    <span>{appointment.timeType.valueVi}</span>
-                                                </div>
-
-                                                <div className="flex">
-                                                    <span className="w-48 font-medium">Chuyên khoa:</span>
-                                                    <span>{appointment.doctorInfo.specialty.name}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Cột 2 */}
-                                        <div className="flex-1">
-                                            <div className="space-y-3">
-                                                <div className="flex">
-                                                    <span className="w-48 font-medium">Bệnh viện:</span>
-                                                    <span>{appointment.doctorInfo.clinic.name}</span>
-                                                </div>
-                                                <div className="flex">
-                                                    <span className="w-48 font-medium">Địa chỉ:</span>
-                                                    <span>{appointment.doctorInfo.clinic.address}</span>
-                                                </div>
-                                                <div className="flex">
-                                                    <span className="w-48 font-medium">Lý do khám:</span>
-                                                    <span>{appointment.reason}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {/* Nút hành động */}
-                                    <div className="mt-20 flex justify-end space-x-4">
-                                        {/* {appointment.status.valueVi === 'Chưa thanh toán' && (
+                                {/* Nút hành động */}
+                                <div className="mt-20 flex justify-end space-x-4">
+                                    {/* {appointment.status.valueVi === 'Chưa thanh toán' && (
                                             <button
                                                 className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors"
                                                 onClick={() => handlePayment(appointment.bookingId)}
@@ -190,20 +185,16 @@ const AppointmentManagement = () => {
                                                 Thanh toán lại
                                             </button>
                                         )} */}
-                                        {appointment.status.valueVi === 'Đã xác nhận' && (
-                                            <button
-                                                className="px-6 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors"
-                                                onClick={() =>
-                                                    openModal(
-                                                        appointment.bookingId,
-                                                        appointment.patientRecordId.fullname,
-                                                    )
-                                                }
-                                            >
-                                                Hủy lịch hẹn
-                                            </button>
-                                        )}
-                                    </div>
+                                    {appointment.status.valueVi === 'Đã xác nhận' && (
+                                        <button
+                                            className="px-6 py-3 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors"
+                                            onClick={() =>
+                                                openModal(appointment.bookingId, appointment.patientRecordId.fullname)
+                                            }
+                                        >
+                                            Hủy lịch hẹn
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>

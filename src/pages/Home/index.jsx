@@ -4,7 +4,6 @@ import { GrLocation } from 'react-icons/gr';
 import { LiaStethoscopeSolid } from 'react-icons/lia';
 import { CiHospital1 } from 'react-icons/ci';
 import { BsCoin } from 'react-icons/bs';
-import { Icon } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { axiosClient } from '~/api/apiRequest';
 
@@ -22,82 +21,7 @@ function Home() {
         'https://i.pinimg.com/736x/36/c5/28/36c5286f8f150bf662214022935332c4.jpg',
     ];
 
-    const IMAGE_URL = 'http://localhost:9000/uploads/';
-
-    // const specialties = [
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2FChuyenKhoa.png&w=96&q=75',
-    //         name: 'Bác sĩ Gia Đình',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fumc%2Fsubjects%2F1655710722460-TIEU_HOA_GAN_MAT.png&w=96&q=75',
-    //         name: 'Tiêu Hóa Gan Mật',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Fnoi_tong_quat.png&w=96&q=75',
-    //         name: 'Nội Tổng Quát',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Fnoi_tiet.png&w=96&q=75',
-    //         name: 'Nội Tiết',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Fda_lieu.png&w=96&q=75',
-    //         name: 'Da liễu',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Ftim_mach.png&w=96&q=75',
-    //         name: 'Nội Tim Mạch',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Fthan_kinh.png&w=96&q=75',
-    //         name: 'Nội Thần Kinh',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Fnoi_co_xuong_khop.png&w=96&q=75',
-    //         name: 'Nội Cơ Xương Khớp',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Ftai_mui_hong.png&w=96&q=75',
-    //         name: 'Tai Mũi Họng',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Fmat.png&w=96&q=75',
-    //         name: 'Mắt',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Ftieu_hoa.png&w=96&q=75',
-    //         name: 'Nội Tiêu Hoá',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fumc%2Fsubjects%2FPG%2F1651821563777-VIEM_GAN.png&w=96&q=75',
-    //         name: 'Nội Truyền Nhiễm',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Fho_hap.png&w=96&q=75',
-    //         name: 'Nội Hô Hấp',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Ftiet_nieu.png&w=96&q=75',
-    //         name: 'Nội Tiết Niệu',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Fxuong_khop_chinh_hinh.png&w=96&q=75',
-    //         name: 'Ngoại Cơ Xương Khớp',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Fsan_phu_khoa.png&w=96&q=75',
-    //         name: 'Sản - Phụ Khoa',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2Fsubjects%2Frang_ham_mat.png&w=96&q=75',
-    //         name: 'Răng Hàm Mặt',
-    //     },
-    //     {
-    //         image: 'https://medpro.vn/_next/image?url=https%3A%2F%2Fcdn-pkh.longvan.net%2Fmedpro-production%2Fdefault%2Favatar%2FChuyenKhoa.png&w=96&q=75',
-    //         name: 'Y Học Cổ Truyền',
-    //     },
-    // ];
+    const IMAGE_URL = `http://localhost:${import.meta.env.VITE_BE_PORT}/uploads/`;
 
     useEffect(() => {
         const fetcSpecialty = async () => {

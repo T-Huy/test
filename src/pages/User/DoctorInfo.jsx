@@ -6,6 +6,7 @@ import parse from 'html-react-parser';
 import './CSS/DoctorDescription.css';
 import { GrLocation } from 'react-icons/gr';
 import { CiHospital1 } from 'react-icons/ci';
+import { UserContext } from '~/context/UserContext';
 
 function DoctorInfo() {
     const [selectedTime, setSelectedTime] = useState('');
@@ -13,6 +14,7 @@ function DoctorInfo() {
     const [schedule, setSchedule] = useState([]);
     const [doctorInfo, setDoctorInfo] = useState([]);
     const { state } = useLocation();
+    const {user}=useContext(UserContext);
     console.log('STATE', state);
 
     const [searchParams] = useSearchParams();
@@ -58,7 +60,7 @@ function DoctorInfo() {
         setCurrentDate(event.target.value);
     };
 
-    const IMAGE_URL = 'http://localhost:9000/uploads/';
+    const IMAGE_URL = `http://localhost:${import.meta.env.VITE_BE_PORT}/uploads/`;
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
     };
@@ -106,6 +108,9 @@ function DoctorInfo() {
     };
 
     const handleTimeSlotClick = (timeSlot) => {
+        if(!user.auth){
+            return navigate('/login');
+        }
         setSelectedTime(timeSlot);
         navigate('/bac-si/get/record', {
             state: {
