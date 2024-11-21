@@ -517,7 +517,7 @@ const ClinicManagement = () => {
                                 <th className="border border-gray-300 px-4 py-2">Email</th>
                                 <th className="border border-gray-300 px-4 py-2">Địa chỉ</th>
                                 <th className="border border-gray-300 px-4 py-2">Số điện thoại</th>
-                                <th className="border border-gray-300 px-4 py-2">Thao tác</th>
+                                <th className="border border-gray-300 px-4 py-2 min-w-36">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>

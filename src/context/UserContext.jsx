@@ -36,6 +36,7 @@ const UserProvider = ({ children }) => {
                 role: decodeToken.roleId,
                 auth: true,
             });
+            localStorage.setItem('email', email);
             localStorage.setItem('token', token);
         } catch (error) {
             console.error('Invalid token:', error);
@@ -55,12 +56,13 @@ const UserProvider = ({ children }) => {
     };
 
     useEffect(() => {
+        const email = localStorage.getItem('email');
         const token = localStorage.getItem('token');
         if (token) {
             try {
                 const decodeToken = jwtDecode(token);
                 setUser({
-                    email: decodeToken.email,
+                    email: email,
                     userId: decodeToken.userId,
                     role: decodeToken.roleId,
                     auth: true,
@@ -71,6 +73,7 @@ const UserProvider = ({ children }) => {
             }
         }
     }, []);
+    console.log('User:', user);
 
     return <UserContext.Provider value={{ user, loginContext, logout }}>{children}</UserContext.Provider>;
 };
