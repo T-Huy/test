@@ -63,19 +63,19 @@ function Header() {
                     {/* Navigation */}
                     <nav className="hidden sm:ml-6 sm:flex sm:space-x-8 mr-32">
                         <NavLink
-                            to="#"
+                            to="/benh-vien-all"
                             className="inline-flex items-center px-1 pt-1 text-2xl font-bold text-gray-500 hover:text-gray-700"
                         >
                             Bệnh viện
                         </NavLink>
                         <NavLink
-                            to="#"
+                            to="/bac-si"
                             className="inline-flex items-center px-1 pt-1 text-2xl font-bold text-gray-500 hover:text-gray-700"
                         >
                             Bác sĩ
                         </NavLink>
                         <NavLink
-                            to="#"
+                            to="/chuyen-khoa"
                             className="inline-flex items-center px-1 pt-1 text-2xl font-bold text-gray-500 hover:text-gray-700"
                         >
                             Chuyên khoa
