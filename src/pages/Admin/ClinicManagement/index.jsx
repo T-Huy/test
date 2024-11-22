@@ -18,7 +18,7 @@ const ClinicManagement = () => {
     const [previewImage, setPreviewImage] = useState({});
     const [showConfirm, setShowConfirm] = useState(false);
     const [filterValue, setFilterValue] = useState('');
-    const [pagination, setPagination] = useState({ page: 1, limit: 6, totalPages: 1 });
+    const [pagination, setPagination] = useState({ page: 1, limit: 5, totalPages: 1 });
     const [clinics, setClinics] = useState([]);
     const [avata, setAvata] = useState('');
 
@@ -579,7 +579,7 @@ const ClinicManagement = () => {
                             value={pagination.limit}
                             onChange={handleLimitChange}
                         >
-                            <option value="6">6</option>
+                            <option value="5">5</option>
                             <option value="10">10</option>
                             <option value="15">15</option>
                         </select>

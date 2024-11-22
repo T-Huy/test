@@ -6,6 +6,7 @@ import { IoMenu } from "react-icons/io5";
 import { UserContext } from "~/context/UserContext";
 import { axiosInstance } from '~/api/apiRequest';
 import Logo from "~/components/Logo";
+import { toast } from "react-toastify";
 
 const WorktimeManagement = () => {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -18,7 +19,7 @@ const WorktimeManagement = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [filterValue, setFilterValue] = useState('');
   const [filterDate, setFilterDate] = useState('');
-  const [pagination, setPagination] = useState({ page: 1, limit: 6, totalPages: 1 });
+  const [pagination, setPagination] = useState({ page: 1, limit: 5, totalPages: 1 });
   const [doctors, setDoctors] = useState([]);
   const [worktimes, setWorkTimes] = useState([]);
   const [avata, setAvata] = useState('');
@@ -320,7 +321,7 @@ const WorktimeManagement = () => {
       return; // Ngăn không thêm nếu có lỗi
     }
     createWorkTimeAPI(worktime)
-    alert("Thêm ca làm việc thành công!");
+    toast.success("Thêm ca làm việc thành công!");
     setValidationErrors(errors);
     console.log("New Worktime Info:", worktime);
     handleCloseModal();
@@ -336,7 +337,7 @@ const WorktimeManagement = () => {
       return; // Ngăn không thêm nếu có lỗi
     }
     updateWorkTimeAPI(updateWorkTime)
-    alert("Cập nhật ca làm việc thành công!");
+    toast.success("Cập nhật ca làm việc thành công!");
     setValidationErrors(errors);
     console.log("Updated Worktime Info:", updateWorkTime);
     handleCloseUpdateModal();
@@ -573,7 +574,7 @@ const WorktimeManagement = () => {
               value={pagination.limit}
               onChange={handleLimitChange}
             >
-              <option value="6">6</option>
+              <option value="5">5</option>
               <option value="10">10</option>
               <option value="15">15</option>
             </select>

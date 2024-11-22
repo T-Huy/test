@@ -17,7 +17,7 @@ const ScheduleManagement = () => {
     const { logout, user } = useContext(UserContext);
     const [filterValue, setFilterValue] = useState('');
     const [filterDate, setFilterDate] = useState('');
-    const [pagination, setPagination] = useState({ page: 1, limit: 10, totalPages: 1 });
+    const [pagination, setPagination] = useState({ page: 1, limit: 9, totalPages: 1 });
     const [schedules, setSchedules] = useState([]);
     const [avata, setAvata] = useState('');
 
@@ -469,9 +469,9 @@ const ScheduleManagement = () => {
                             value={pagination.limit}
                             onChange={handleLimitChange}
                         >
-                            <option value="10">10</option>
+                            <option value="9">9</option>
                             <option value="15">15</option>
-                            <option value="20">20</option>
+                            <option value="21">21</option>
                         </select>
                     </div>
                     <div className="flex justify-end items-center space-x-4 mt-4">

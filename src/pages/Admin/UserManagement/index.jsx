@@ -6,6 +6,7 @@ import { IoMenu } from "react-icons/io5";
 import { UserContext } from "~/context/UserContext";
 import { axiosInstance } from '~/api/apiRequest';
 import Logo from "~/components/Logo";
+import { toast } from "react-toastify";
 const UserManagement = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,7 +18,7 @@ const UserManagement = () => {
   const [previewImage, setPreviewImage] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
   const [filterValue, setFilterValue] = useState('');
-  const [pagination, setPagination] = useState({ page: 1, limit: 6, totalPages: 1 });
+  const [pagination, setPagination] = useState({ page: 1, limit: 5, totalPages: 1 });
   const [users, setUsers] = useState([]);
   const [avata, setAvata] = useState('');
 
@@ -323,7 +324,7 @@ const UserManagement = () => {
       formData.append('image', selectedFile);
     }
     createUserAPI(formData)
-    alert("Thêm tài khoản thành công!");
+    toast.success("Thêm tài khoản thành công!");
     setValidationErrors(errors);
     setSelectedFile(null)
     console.log("New User Info:", addUser);
@@ -355,7 +356,7 @@ const UserManagement = () => {
     }
     updateUserAPI(formData);
 
-    alert("Cập nhật tài khoản thành công!");
+    toast.success("Cập nhật tài khoản thành công!");
     setValidationErrors(errors);
     setSelectedFile(null);
     console.log("Updated User Info:", updateUser);
@@ -587,7 +588,7 @@ const UserManagement = () => {
               value={pagination.limit}
               onChange={handleLimitChange}
             >
-              <option value="6">6</option>
+              <option value="5">5</option>
               <option value="10">10</option>
               <option value="15">15</option>
             </select>

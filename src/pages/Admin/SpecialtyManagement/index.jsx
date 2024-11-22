@@ -6,6 +6,7 @@ import { IoMenu } from "react-icons/io5";
 import { UserContext } from "~/context/UserContext";
 import { axiosInstance } from '~/api/apiRequest';
 import Logo from "~/components/Logo";
+import { toast } from "react-toastify";
 const SpecialtyManagement = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,7 +17,7 @@ const SpecialtyManagement = () => {
   const [previewImage, setPreviewImage] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
   const [filterValue, setFilterValue] = useState('');
-  const [pagination, setPagination] = useState({ page: 1, limit: 6, totalPages: 1 });
+  const [pagination, setPagination] = useState({ page: 1, limit: 5, totalPages: 1 });
   const [specialties, setSpecialties] = useState([]);
   const [avata, setAvata] = useState('');
 
@@ -289,7 +290,7 @@ const SpecialtyManagement = () => {
     }
 
     createSpecialtyAPI(formData)
-    alert("Thêm chuyên khoa thành công!");
+    toast.success("Thêm chuyên khoa thành công!");
     setValidationErrors(errors);
     setSelectedFile(null)
     console.log("New Specialty Info:", specialty);
@@ -315,7 +316,7 @@ const SpecialtyManagement = () => {
       formData.append('image', selectedFile);
     }
     updateSpecialtyAPI(formData);
-    alert("Cập nhật chuyên khoa thành công!");
+    toast.success("Cập nhật chuyên khoa thành công!");
     setValidationErrors(errors);
     setSelectedFile(null)
     console.log("Updated Specialty Info:", updateSpecialty);
@@ -536,7 +537,7 @@ const SpecialtyManagement = () => {
               value={pagination.limit}
               onChange={handleLimitChange}
             >
-              <option value="6">6</option>
+              <option value="5">5</option>
               <option value="10">10</option>
               <option value="15">15</option>
             </select>
