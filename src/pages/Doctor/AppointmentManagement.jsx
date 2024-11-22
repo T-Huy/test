@@ -11,7 +11,9 @@ function PatientManagement() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate(); // Thêm useNavigate
+
     const { user } = useContext(UserContext);
+
     useEffect(() => {
         // Đặt ngày mặc định là ngày hiện tại khi component được tải
         const today = new Date().toISOString().split('T')[0];
