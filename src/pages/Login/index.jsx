@@ -69,7 +69,7 @@ function Login() {
                 console.log(decodeToken.roleId);
 
                 if (decodeToken.roleId === 'R1') {
-                    navigate('/admin/');
+                    navigate('/admin/clinic');
                 } else if (decodeToken.roleId === 'R2') navigate('/doctor/');
                 else {
                     navigate('/');

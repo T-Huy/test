@@ -41,29 +41,12 @@ function AllDoctor() {
         }
     }
 
-    // useEffect(() => {
-    //     const fetchFindDoctors = async () => {
-    //         try {
-    //             const response = await axiosInstance.get(
-    //                 `/doctor?limit=${20}&clinicId=${getClinicId}&specialtyId=${getSpecialtyId}`,
-    //             );
-
-    //             if (response.errCode === 0) {
-    //                 setAllDoctors(response.data);
-    //             }
-    //         } catch (error) {
-    //             console.error('Failed to fetch doctors:', error.message);
-    //         }
-    //     };
-
-    //     fetchFindDoctors();
-    // }, []);
 
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
                 const response = await axiosInstance.get(
-                    `/doctor?page=${pagination.page}&limit=${pagination.limit}&clinicId=${getClinicId}&specialtyId=${getSpecialtyId}`,
+                    `/doctor?query=${searchQuery}&page=${pagination.page}&limit=${pagination.limit}&clinicId=${getClinicId}&specialtyId=${getSpecialtyId}`,
                 );
                 console.log('page', pagination.page);
                 console.log(pagination.limit);
@@ -87,16 +70,16 @@ function AllDoctor() {
         };
 
         fetchDoctors();
-    }, [pagination]);
+    }, [pagination,searchQuery]);
 
     console.log('alldoctors:', allDoctors);
     console.log('doctors:', doctors);
 
-    const filteredDoctors = doctors.filter(
-        (doctor) =>
-            doctor.doctorId.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            doctor.specialtyId.name.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
+    // const filteredDoctors = doctors.filter(
+    //     (doctor) =>
+    //         doctor.doctorId.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    //         doctor.specialtyId.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    // );
 
     const IMAGE_URL = 'http://localhost:9000/uploads/';
     const formatCurrency = (value) =>
@@ -150,7 +133,7 @@ function AllDoctor() {
 
             {/* Doctors List */}
             <div>
-                {filteredDoctors.map((doctor) => (
+                {doctors.map((doctor) => (
                     <div
                         key={doctor._id}
                         className="flex justify-center items-center gap-4 p-6 mb-6 border rounded-lg hover:shadow-lg transition-shadow"
