@@ -14,7 +14,7 @@ function DoctorInfo() {
     const [schedule, setSchedule] = useState([]);
     const [doctorInfo, setDoctorInfo] = useState([]);
     const { state } = useLocation();
-    const {user}=useContext(UserContext);
+    const { user } = useContext(UserContext);
     console.log('STATE', state);
 
     const [searchParams] = useSearchParams();
@@ -108,7 +108,7 @@ function DoctorInfo() {
     };
 
     const handleTimeSlotClick = (timeSlot) => {
-        if(!user.auth){
+        if (!user.auth) {
             return navigate('/login');
         }
         setSelectedTime(timeSlot);

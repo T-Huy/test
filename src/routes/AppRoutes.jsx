@@ -7,10 +7,6 @@ import AdminRoutes from '~/routes/AdminRoutes';
 import DoctorRoutes from '~/routes/DoctorRoutes';
 import HomeLayout from '~/layouts/HomeLayout';
 import DoctorInfo from '~/pages/User/DoctorInfo';
-import UserDashboard from '~/pages/User/UserDashboard';
-import UserProfile from '~/pages/User/UserProfile';
-import PatientRecords from '~/pages/User/PatientRecords';
-import AppointmentManagement from '~/pages/User/AppointmentManagement';
 import UserRoutes from './UserRoutes';
 import ForgotPassword from '~/pages/ForgotPassword';
 import ConfirmOTP from '~/pages/ConfirmOTP';
@@ -40,11 +36,6 @@ function AppRoutes() {
                     <Route path="/benh-vien" element={<ClinicInfo />} />
                     <Route path="/benh-vien/chuyen-khoa" element={<Specialties />} />
                     <Route path="/chuyen-khoa" element={<AllSpecialty />} />
-
-                    {/* <Route path="/user" element={<UserDashboard />} /> */}
-                    {/* <Route path="/user/profile" element={<UserProfile />} />
-                    <Route path="/user/appointments" element={<AppointmentManagement />} />
-                    <Route path="/user/records" element={<PatientRecords />} /> */}
                 </Route>
                 {AdminRoutes()}
                 {DoctorRoutes()}
