@@ -58,7 +58,7 @@ function AllClinic() {
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
-                const response = await axiosInstance.get(`/clinic?page=${pagination.page}&limit=${pagination.limit}`);
+                const response = await axiosInstance.get(`/clinic?query=${searchQuery}&page=${pagination.page}&limit=${pagination.limit}`);
                 console.log('page', pagination.page);
                 console.log(pagination.limit);
                 console.log('response:', response);
@@ -81,15 +81,15 @@ function AllClinic() {
         };
 
         fetchDoctors();
-    }, [pagination]);
+    }, [pagination,searchQuery]);
 
     console.log('alldoctors:', allDoctors);
     console.log('doctors:', doctors);
 
-    const filteredDoctors = doctors.filter(
-        (doctor) => doctor.name.toLowerCase().includes(searchQuery.toLowerCase()),
-        // doctor.specialtyId.name.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
+    // const filteredDoctors = doctors.filter(
+    //     (doctor) => doctor.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    //     // doctor.specialtyId.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    // );
 
     const IMAGE_URL = 'http://localhost:9000/uploads/';
     const formatCurrency = (value) =>
@@ -144,7 +144,7 @@ function AllClinic() {
 
             {/* Doctors List */}
             <div>
-                {filteredDoctors.map((doctor) => (
+                {doctors.map((doctor) => (
                     <div
                         key={doctor._id}
                         className="flex justify-center items-center gap-4 p-6 mb-6 border rounded-lg hover:shadow-lg transition-shadow"

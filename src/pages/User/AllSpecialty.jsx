@@ -59,7 +59,7 @@ function AllSpecialty() {
         const fetchDoctors = async () => {
             try {
                 const response = await axiosInstance.get(
-                    `/specialty?page=${pagination.page}&limit=${pagination.limit}`,
+                    `/specialty?query=${searchQuery}&page=${pagination.page}&limit=${pagination.limit}`,
                 );
                 console.log('page', pagination.page);
                 console.log(pagination.limit);
@@ -83,12 +83,12 @@ function AllSpecialty() {
         };
 
         fetchDoctors();
-    }, [pagination]);
+    }, [pagination,searchQuery]);
 
     console.log('alldoctors:', allDoctors);
     console.log('doctors:', doctors);
 
-    const filteredDoctors = doctors.filter((doctor) => doctor.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    // const filteredDoctors = doctors.filter((doctor) => doctor.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const IMAGE_URL = 'http://localhost:9000/uploads/';
     const formatCurrency = (value) =>
@@ -146,7 +146,7 @@ function AllSpecialty() {
 
             {/* Doctors List */}
             <div>
-                {filteredDoctors.map((doctor) => (
+                {doctors.map((doctor) => (
                     <div
                         key={doctor._id}
                         className="flex justify-center items-center gap-4 p-6 mb-6 border rounded-lg hover:shadow-lg transition-shadow"
