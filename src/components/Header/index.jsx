@@ -53,7 +53,16 @@ function Header() {
             <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-20">
                     {/* Logo */}
-                    <NavLink to="/" className="flex-shrink-0 flex items-center mr-auto">
+                    <NavLink
+                        to="/"
+                        onClick={(e) => {
+                            if (window.location.pathname === '/') {
+                                e.preventDefault();
+                                window.scrollTo(0, 0);
+                            }
+                        }}
+                        className="flex-shrink-0 flex items-center mr-auto"
+                    >
                         <span className="text-4xl font-bold">
                             <span className="text-green-500">Easy</span>
                             <span className="text-blue-500">Med</span>
