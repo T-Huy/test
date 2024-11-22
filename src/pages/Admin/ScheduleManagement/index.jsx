@@ -291,7 +291,7 @@ const ScheduleManagement = () => {
                                     alt="Logo"
                                     className="w-24 h-24 object-contain"
                                 /> */}
-                                <Logo/>
+                                <Logo />
                             </div>
                             {/* Admin và Menu */}
                             <div
@@ -414,7 +414,9 @@ const ScheduleManagement = () => {
                             {schedules.length > 0 ? (
                                 schedules.map((sche, index) => (
                                     <tr key={sche.bookingId} className="text-center">
-                                        <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                                        <td className="border border-gray-300 px-2 py-1">
+                                            {index + 1 + pagination.limit * (pagination.page - 1)}
+                                        </td>
                                         <td className="border border-gray-300 px-2 py-1">
                                             {sche.appointmentDate.split('-').reverse().join('-')}
                                         </td>

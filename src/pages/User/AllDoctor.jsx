@@ -41,7 +41,6 @@ function AllDoctor() {
         }
     }
 
-
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
@@ -70,7 +69,7 @@ function AllDoctor() {
         };
 
         fetchDoctors();
-    }, [pagination,searchQuery]);
+    }, [pagination, searchQuery]);
 
     console.log('alldoctors:', allDoctors);
     console.log('doctors:', doctors);
@@ -90,15 +89,19 @@ function AllDoctor() {
         navigate(`/bac-si/get?id=${doctorId}`);
     };
 
-    const positions = ['P0', 'P1', 'P2']; // Mảng các giá trị cần so sánh
+    const positions = ['P0', 'P1', 'P2', 'P3']; // Mảng các giá trị cần so sánh
 
     const getPositionLabel = (position) => {
         if (position === 'P0') {
             return 'Bác sĩ';
-        } else if (positions.includes(position)) {
-            return 'Chức danh khác'; // Thay thế bằng nhãn phù hợp cho các giá trị khác trong mảng
+        } else if (position === 'P1') {
+            return 'Trưởng khoa';
+        } else if (position === 'P2') {
+            return 'Giáo sư';
+        } else if (position === 'P3') {
+            return 'Phó giáo sư';
         } else {
-            return position; // Giá trị mặc định nếu không khớp với bất kỳ giá trị nào trong mảng
+            return ''; // Giá trị mặc định nếu không khớp với bất kỳ giá trị nào trong mảng
         }
     };
 

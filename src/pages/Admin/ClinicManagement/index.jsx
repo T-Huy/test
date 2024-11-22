@@ -438,7 +438,7 @@ const ClinicManagement = () => {
                                     alt="Logo"
                                     className="w-24 h-24 object-contain"
                                 /> */}
-                                <Logo/>
+                                <Logo />
                             </div>
                             {/* Admin và Menu */}
                             <div
@@ -537,7 +537,9 @@ const ClinicManagement = () => {
                         <tbody>
                             {clinics.map((clinic, index) => (
                                 <tr key={clinic.clinicId}>
-                                    <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
+                                    <td className="border border-gray-300 px-4 py-2 text-center">
+                                        {index + 1 + pagination.limit * (pagination.page - 1)}
+                                    </td>
                                     <td className="border border-gray-300 px-4 py-2 text-center">{clinic.name}</td>
                                     <td className="border border-gray-300 px-4 py-2 text-center">
                                         <div className="w-24 h-24 bg-gray-300 rounded-full mx-auto">
