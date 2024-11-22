@@ -6,6 +6,7 @@ import { IoMenu } from 'react-icons/io5';
 import { UserContext } from '~/context/UserContext';
 import { axiosInstance } from '~/api/apiRequest';
 import Logo from '~/components/Logo';
+import { toast } from 'react-toastify';
 
 const ScheduleManagement = () => {
     const [isExpanded, setIsExpanded] = useState(true);
@@ -184,7 +185,7 @@ const ScheduleManagement = () => {
             return; // Ngăn không thêm nếu có lỗi
         }
         updateScheduleAPI(updateSchedule);
-        alert('Cập nhật lịch hẹn thành công!');
+        toast.success('Cập nhật lịch hẹn thành công!');
         setValidationErrors(errors);
         console.log('Updated Schedule Info:', updateSchedule);
         handleCloseUpdateModal();
