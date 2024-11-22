@@ -6,6 +6,8 @@ import { IoMenu } from 'react-icons/io5';
 import { UserContext } from '~/context/UserContext';
 import { axiosInstance } from '~/api/apiRequest';
 import Logo from '~/components/Logo';
+import { toast } from 'react-toastify';
+
 const ClinicManagement = () => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -296,7 +298,7 @@ const ClinicManagement = () => {
             formData.append('image', selectedFile);
         }
         createClinicAPI(formData);
-        alert('Thêm bệnh viện thành công!');
+        toast.success('Thêm bệnh viện thành công!');
         setValidationErrors(errors);
         setSelectedFile(null);
         console.log('New Clinic Info:', clinic);
@@ -325,7 +327,7 @@ const ClinicManagement = () => {
             formData.append('image', selectedFile);
         }
         updateClinicAPI(formData);
-        alert('Cập nhật bệnh viện thành công!');
+        toast.success('Cập nhật bệnh viện thành công!');
         setValidationErrors(errors);
         setSelectedFile(null);
         console.log('Updated Clinic Info:', updateClinic);
@@ -450,7 +452,7 @@ const ClinicManagement = () => {
                                         src={
                                             avata
                                                 ? `http://localhost:9000/uploads/${avata}`
-                                                : 'http://localhost:/src/assets/img/avatar.png'
+                                                : 'http://localhost:3000/src/assets/img/avatar.png'
                                         }
                                         alt="Profile"
                                         className="w-full h-full object-cover"
