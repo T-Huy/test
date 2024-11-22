@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { IoMenu } from 'react-icons/io5';
 import { UserContext } from '~/context/UserContext';
 import { axiosInstance } from '~/api/apiRequest';
+import { toast } from 'react-toastify';
 const ClinicManagement = () => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,19 +38,19 @@ const ClinicManagement = () => {
         phoneNumber: '',
         description: '',
         image: '',
-    })
+    });
 
     const [deleteClinic, setDeleteClinic] = useState({
-        clinicId: ''
-    })
+        clinicId: '',
+    });
 
     const getAvataAccount = async (userId) => {
         try {
             const response = await axiosInstance.get(`/user/${userId}`);
 
-            if (response.status === "OK") {
+            if (response.status === 'OK') {
                 // Xử lý khi thành công
-                setAvata(response.data.image)
+                setAvata(response.data.image);
             } else {
                 console.error('Failed to update schedule:', response.message);
             }
@@ -92,14 +93,14 @@ const ClinicManagement = () => {
         }
     };
     const getDetailClinicAPI = async (clinicId) => {
-        setIsUpdateModalOpen(true)
+        setIsUpdateModalOpen(true);
         setUpdateClinic({ ...updateClinic, clinicId: clinicId });
         try {
             const response = await axiosInstance.get(`/clinic/${clinicId}`);
 
             if (response.errCode === 0) {
                 // Xử lý khi thành công
-                setUpdateClinic(response.data)
+                setUpdateClinic(response.data);
             } else {
                 console.error('Failed to get detail clinic:', response.message);
             }
@@ -123,15 +124,17 @@ const ClinicManagement = () => {
 
     const filterClinicAPI = async () => {
         try {
-            const response = await axiosInstance.get(`/clinic/?query=${filterValue}&page=${pagination.page}&limit=${pagination.limit}`);
+            const response = await axiosInstance.get(
+                `/clinic/?query=${filterValue}&page=${pagination.page}&limit=${pagination.limit}`,
+            );
 
             if (response.errCode === 0) {
                 //console.log('Fetched users:', response.data);
                 setClinics(response.data);
-                if(response.totalPages === 0){
-                    response.totalPages = 1
-                  }
-                if(pagination.totalPages !== response.totalPages){
+                if (response.totalPages === 0) {
+                    response.totalPages = 1;
+                }
+                if (pagination.totalPages !== response.totalPages) {
                     setPagination((prev) => ({
                         ...prev,
                         page: 1,
@@ -140,11 +143,11 @@ const ClinicManagement = () => {
                 }
             } else {
                 console.error('No users are found:', response.message);
-                setClinics([])
+                setClinics([]);
             }
         } catch (error) {
             console.error('Error fetching users:', error);
-            setClinics([])
+            setClinics([]);
         }
     };
 
@@ -166,7 +169,7 @@ const ClinicManagement = () => {
     };
     //Đổi số lượng (limit)
     const handleLimitChange = async (e) => {
-        const newLimit = parseInt(e.target.value, 10)
+        const newLimit = parseInt(e.target.value, 10);
         setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
     };
 
@@ -191,12 +194,12 @@ const ClinicManagement = () => {
 
     const handleDeleteClick = (clinicId) => {
         setShowConfirm(true);
-        setDeleteClinic({ clinicId: clinicId })
+        setDeleteClinic({ clinicId: clinicId });
     };
 
     const handleCancelDelete = () => {
         setShowConfirm(false);
-        setDeleteClinic({ clinicId: '' })
+        setDeleteClinic({ clinicId: '' });
     };
 
     const handleConfirmDelete = () => {
@@ -228,7 +231,7 @@ const ClinicManagement = () => {
     const handleCloseUpdateModal = () => {
         setValidationErrors({});
         setIsUpdateModalOpen(false);
-        setPreviewImage({image: ""})
+        setPreviewImage({ image: '' });
     };
 
     const handleChange = (e) => {
@@ -256,7 +259,7 @@ const ClinicManagement = () => {
                 image: '', // Xóa thông báo lỗi khi có hình ảnh hợp lệ
             }));
         }
-        setSelectedFile(file)
+        setSelectedFile(file);
     };
 
     const handleUpdateImageUpload = (e) => {
@@ -266,7 +269,7 @@ const ClinicManagement = () => {
             const objectURL = URL.createObjectURL(file);
             setPreviewImage({ image: objectURL }); // Lưu blob URL
         }
-        setSelectedFile(file)
+        setSelectedFile(file);
     };
 
     const handleAddClinic = () => {
@@ -292,10 +295,10 @@ const ClinicManagement = () => {
         if (selectedFile && selectedFile.name) {
             formData.append('image', selectedFile);
         }
-        createClinicAPI(formData)
-        alert('Thêm bệnh viện thành công!');
+        createClinicAPI(formData);
+        toast.success('Thêm bệnh viện thành công!');
         setValidationErrors(errors);
-        setSelectedFile(null)
+        setSelectedFile(null);
         console.log('New Clinic Info:', clinic);
         handleCloseModal();
     };
@@ -322,13 +325,12 @@ const ClinicManagement = () => {
             formData.append('image', selectedFile);
         }
         updateClinicAPI(formData);
-        alert('Cập nhật bệnh viện thành công!');
+        toast.success('Cập nhật bệnh viện thành công!');
         setValidationErrors(errors);
-        setSelectedFile(null)
+        setSelectedFile(null);
         console.log('Updated Clinic Info:', updateClinic);
         handleCloseUpdateModal();
     };
-
 
     const toggleAdminMenu = () => {
         setIsExpanded(!isExpanded);
@@ -405,10 +407,11 @@ const ClinicManagement = () => {
                     {menuItems.map((item) => (
                         <li
                             key={item.path}
-                            className={`cursor-pointer flex items-center px-4 py-2 rounded ${location.pathname === item.path
-                                ? 'bg-pink-500 text-white' // Nền hồng cho mục hiện tại
-                                : 'hover:bg-gray-200' // Hover hiệu ứng cho mục khác
-                                } ${isExpanded ? 'justify-start' : 'justify-center'}`}
+                            className={`cursor-pointer flex items-center px-4 py-2 rounded ${
+                                location.pathname === item.path
+                                    ? 'bg-pink-500 text-white' // Nền hồng cho mục hiện tại
+                                    : 'hover:bg-gray-200' // Hover hiệu ứng cho mục khác
+                            } ${isExpanded ? 'justify-start' : 'justify-center'}`}
                             onClick={() => navigate(item.path)}
                         >
                             <span className="text-xl">{item.icon}</span>
@@ -444,7 +447,11 @@ const ClinicManagement = () => {
                                 <span className="font-bold">Admin</span>
                                 <div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
                                     <img
-                                        src={avata ? `http://localhost:9000/uploads/${avata}` : 'http://localhost:3000/src/assets/img/avatar.png'}
+                                        src={
+                                            avata
+                                                ? `http://localhost:9000/uploads/${avata}`
+                                                : 'http://localhost:3000/src/assets/img/avatar.png'
+                                        }
                                         alt="Profile"
                                         className="w-full h-full object-cover"
                                     />
@@ -492,7 +499,12 @@ const ClinicManagement = () => {
                                 onChange={(e) => setFilterValue(e.target.value)}
                                 className="border border-gray-400 rounded px-3 py-2 w-96"
                             />
-                            <button className="bg-gray-200 border border-gray-400 px-4 py-2 rounded" onClick={() => filterClinicAPI()}>🔍</button>
+                            <button
+                                className="bg-gray-200 border border-gray-400 px-4 py-2 rounded"
+                                onClick={() => filterClinicAPI()}
+                            >
+                                🔍
+                            </button>
                         </div>
 
                         {/* Nút Thêm */}
@@ -536,12 +548,22 @@ const ClinicManagement = () => {
                                     </td>
                                     <td className="border border-gray-300 px-4 py-2 text-center">{clinic.email}</td>
                                     <td className="border border-gray-300 px-4 py-2 text-center">{clinic.address}</td>
-                                    <td className="border border-gray-300 px-4 py-2 text-center">{clinic.phoneNumber}</td>
+                                    <td className="border border-gray-300 px-4 py-2 text-center">
+                                        {clinic.phoneNumber}
+                                    </td>
                                     <td className="border border-gray-300 px-4 py-2 text-center space-x-8">
-                                        <button className="text-blue-500" onClick={() => getDetailClinicAPI(clinic.clinicId)}>
+                                        <button
+                                            className="text-blue-500"
+                                            onClick={() => getDetailClinicAPI(clinic.clinicId)}
+                                        >
                                             ✏️
                                         </button>
-                                        <button className="text-red-500" onClick={() => handleDeleteClick(clinic.clinicId)}>🗑️</button>
+                                        <button
+                                            className="text-red-500"
+                                            onClick={() => handleDeleteClick(clinic.clinicId)}
+                                        >
+                                            🗑️
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
@@ -549,7 +571,8 @@ const ClinicManagement = () => {
                     </table>
                     {/* Điều hướng phân trang */}
                     <div className="flex justify-end items-center space-x-4 mt-4">
-                        <select className="border border-gray-400"
+                        <select
+                            className="border border-gray-400"
                             name="number"
                             value={pagination.limit}
                             onChange={handleLimitChange}
@@ -560,15 +583,24 @@ const ClinicManagement = () => {
                         </select>
                     </div>
                     <div className="flex justify-end items-center space-x-4 mt-4">
-                        <button className={`${pagination.page === 1 ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+                        <button
+                            className={`${
+                                pagination.page === 1 ? 'font-normal text-gray-500' : 'font-bold text-blue-500'
+                            }`}
                             onClick={() => handlePageChange(pagination.page - 1)}
-                            disabled={pagination.page === 1}>
+                            disabled={pagination.page === 1}
+                        >
                             Previous
                         </button>
                         <span>
                             Page {pagination.page} of {pagination.totalPages}
                         </span>
-                        <button className={`${pagination.page === pagination.totalPages ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+                        <button
+                            className={`${
+                                pagination.page === pagination.totalPages
+                                    ? 'font-normal text-gray-500'
+                                    : 'font-bold text-blue-500'
+                            }`}
                             onClick={() => handlePageChange(pagination.page + 1)}
                             disabled={pagination.page === pagination.totalPages}
                         >
@@ -600,8 +632,9 @@ const ClinicManagement = () => {
                                                 value={clinic.name}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
-                                                className={`border w-full px-2 py-1 rounded ${validationErrors.name ? 'border-red-500' : 'border-gray-400'
-                                                    }`}
+                                                className={`border w-full px-2 py-1 rounded ${
+                                                    validationErrors.name ? 'border-red-500' : 'border-gray-400'
+                                                }`}
                                             />
                                             {validationErrors.name && (
                                                 <p className="text-red-500 text-sm">{validationErrors.name}</p>
@@ -617,8 +650,9 @@ const ClinicManagement = () => {
                                                 value={clinic.email}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
-                                                className={`border w-full px-2 py-1 rounded ${validationErrors.email ? 'border-red-500' : 'border-gray-400'
-                                                    }`}
+                                                className={`border w-full px-2 py-1 rounded ${
+                                                    validationErrors.email ? 'border-red-500' : 'border-gray-400'
+                                                }`}
                                             />
                                             {validationErrors.email && (
                                                 <p className="text-red-500 text-sm">{validationErrors.email}</p>
@@ -662,8 +696,9 @@ const ClinicManagement = () => {
                                             value={clinic.address}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.address ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.address ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         />
                                         {validationErrors.address && (
                                             <p className="text-red-500 text-sm">{validationErrors.address}</p>
@@ -679,8 +714,9 @@ const ClinicManagement = () => {
                                             value={clinic.phoneNumber}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.phoneNumber ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.phoneNumber ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         />
                                         {validationErrors.phoneNumber && (
                                             <p className="text-red-500 text-sm">{validationErrors.phoneNumber}</p>
@@ -696,8 +732,9 @@ const ClinicManagement = () => {
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             rows="4"
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.description ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.description ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         ></textarea>
                                         {validationErrors.description && (
                                             <p className="text-red-500 text-sm">{validationErrors.description}</p>
@@ -737,8 +774,9 @@ const ClinicManagement = () => {
                                                 value={updateClinic.name}
                                                 onChange={handleUpdateChange}
                                                 onBlur={handleBlur}
-                                                className={`border w-full px-2 py-1 rounded ${validationErrors.name ? 'border-red-500' : 'border-gray-400'
-                                                    }`}
+                                                className={`border w-full px-2 py-1 rounded ${
+                                                    validationErrors.name ? 'border-red-500' : 'border-gray-400'
+                                                }`}
                                             />
                                             {validationErrors.name && (
                                                 <p className="text-red-500 text-sm">{validationErrors.name}</p>
@@ -752,8 +790,9 @@ const ClinicManagement = () => {
                                                 value={updateClinic.email}
                                                 onChange={handleUpdateChange}
                                                 onBlur={handleBlur}
-                                                className={`border w-full px-2 py-1 rounded ${validationErrors.email ? 'border-red-500' : 'border-gray-400'
-                                                    }`}
+                                                className={`border w-full px-2 py-1 rounded ${
+                                                    validationErrors.email ? 'border-red-500' : 'border-gray-400'
+                                                }`}
                                             />
                                             {validationErrors.email && (
                                                 <p className="text-red-500 text-sm">{validationErrors.email}</p>
@@ -770,7 +809,11 @@ const ClinicManagement = () => {
                                                 onClick={() => imageInputRef.current.click()}
                                             >
                                                 <img
-                                                    src={previewImage.image ? previewImage.image : `http://localhost:9000/uploads/${updateClinic.image}`}
+                                                    src={
+                                                        previewImage.image
+                                                            ? previewImage.image
+                                                            : `http://localhost:9000/uploads/${updateClinic.image}`
+                                                    }
                                                     alt="No Image"
                                                     className="w-full h-full object-cover"
                                                 />
@@ -792,8 +835,9 @@ const ClinicManagement = () => {
                                             value={updateClinic.address}
                                             onChange={handleUpdateChange}
                                             onBlur={handleBlur}
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.address ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.address ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         />
                                         {validationErrors.address && (
                                             <p className="text-red-500 text-sm">{validationErrors.address}</p>
@@ -807,8 +851,9 @@ const ClinicManagement = () => {
                                             value={updateClinic.phoneNumber}
                                             onChange={handleUpdateChange}
                                             onBlur={handleBlur}
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.phoneNumber ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.phoneNumber ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         />
                                         {validationErrors.phoneNumber && (
                                             <p className="text-red-500 text-sm">{validationErrors.phoneNumber}</p>
@@ -822,8 +867,9 @@ const ClinicManagement = () => {
                                             onChange={handleUpdateChange}
                                             onBlur={handleBlur}
                                             rows="4"
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.description ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.description ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         ></textarea>
                                         {validationErrors.description && (
                                             <p className="text-red-500 text-sm">{validationErrors.description}</p>
@@ -848,7 +894,10 @@ const ClinicManagement = () => {
                                 <h3 className="text-lg font-semibold mb-4">Xác nhận xóa bệnh viện</h3>
                                 <p>Bạn có chắc chắn muốn xóa bệnh viện này?</p>
                                 <div className="mt-4 flex justify-end gap-4">
-                                    <button onClick={handleCancelDelete} className="px-4 py-2 bg-gray-500 text-white rounded">
+                                    <button
+                                        onClick={handleCancelDelete}
+                                        className="px-4 py-2 bg-gray-500 text-white rounded"
+                                    >
                                         Hủy
                                     </button>
                                     <button

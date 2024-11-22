@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { IoMenu } from 'react-icons/io5';
 import { UserContext } from '~/context/UserContext';
 import { axiosInstance } from '~/api/apiRequest';
+import { toast } from 'react-toastify';
 
 const DoctorManagement = () => {
     const [isExpanded, setIsExpanded] = useState(true);
@@ -70,8 +71,8 @@ const DoctorManagement = () => {
     });
 
     const [deleteDoctor, setDeleteDoctor] = useState({
-        doctorId: ''
-    })
+        doctorId: '',
+    });
 
     const mergedDoctors = doctors.map((doctor) => {
         const user = users.find((user) => user.userId === doctor.doctorId);
@@ -89,9 +90,9 @@ const DoctorManagement = () => {
         try {
             const response = await axiosInstance.get(`/user/${userId}`);
 
-            if (response.status === "OK") {
+            if (response.status === 'OK') {
                 // Xử lý khi thành công
-                setAvata(response.data.image)
+                setAvata(response.data.image);
             } else {
                 console.error('Failed to update schedule:', response.message);
             }
@@ -108,11 +109,11 @@ const DoctorManagement = () => {
                 setUsers(response.data);
             } else {
                 console.error('No users are found:', response.message);
-                setUsers([])
+                setUsers([]);
             }
         } catch (error) {
             console.error('Error fetching users:', error);
-            setUsers([])
+            setUsers([]);
         }
     };
 
@@ -124,11 +125,11 @@ const DoctorManagement = () => {
                 setClinics(response.data);
             } else {
                 console.error('No clinics are found:', response.message);
-                setClinics([])
+                setClinics([]);
             }
         } catch (error) {
             console.error('Error fetching clinics:', error);
-            setClinics([])
+            setClinics([]);
         }
     };
 
@@ -140,11 +141,11 @@ const DoctorManagement = () => {
                 setSpecialties(response.data);
             } else {
                 console.error('No specialty are found:', response.message);
-                setSpecialties([])
+                setSpecialties([]);
             }
         } catch (error) {
             console.error('Error fetching specialty:', error);
-            setSpecialties([])
+            setSpecialties([]);
         }
     };
 
@@ -163,7 +164,7 @@ const DoctorManagement = () => {
         }
     };
     const getDetailDoctorAPI = async (doctor) => {
-        setIsUpdateModalOpen(true)
+        setIsUpdateModalOpen(true);
         setUpdateDoctor({
             doctorInforId: doctor.doctorInforId,
             doctorId: doctor.doctorId.userId,
@@ -207,15 +208,17 @@ const DoctorManagement = () => {
 
     const filterDoctorAPI = async () => {
         try {
-            const response = await axiosInstance.get(`/doctor/?query=${filterValue}&page=${pagination.page}&limit=${pagination.limit}`);
+            const response = await axiosInstance.get(
+                `/doctor/?query=${filterValue}&page=${pagination.page}&limit=${pagination.limit}`,
+            );
 
             if (response.errCode === 0) {
                 //console.log('Fetched users:', response.data);
                 setDoctors(response.data);
-                if(response.totalPages === 0){
-                    response.totalPages = 1
-                  }
-                if(pagination.totalPages !== response.totalPages){
+                if (response.totalPages === 0) {
+                    response.totalPages = 1;
+                }
+                if (pagination.totalPages !== response.totalPages) {
                     setPagination((prev) => ({
                         ...prev,
                         page: 1,
@@ -224,11 +227,11 @@ const DoctorManagement = () => {
                 }
             } else {
                 console.error('No users are found:', response.message);
-                setDoctors([])
+                setDoctors([]);
             }
         } catch (error) {
             console.error('Error fetching users:', error);
-            setDoctors([])
+            setDoctors([]);
         }
     };
 
@@ -244,7 +247,7 @@ const DoctorManagement = () => {
     };
     //Đổi số lượng (limit)
     const handleLimitChange = async (e) => {
-        const newLimit = parseInt(e.target.value, 10)
+        const newLimit = parseInt(e.target.value, 10);
         setPagination((prev) => ({ ...prev, limit: newLimit, page: 1 }));
     };
 
@@ -269,12 +272,12 @@ const DoctorManagement = () => {
 
     const handleDeleteClick = (doctorId) => {
         setShowConfirm(true);
-        setDeleteDoctor({ doctorId: doctorId })
+        setDeleteDoctor({ doctorId: doctorId });
     };
 
     const handleCancelDelete = () => {
         setShowConfirm(false);
-        setDeleteDoctor({ doctorId: '' })
+        setDeleteDoctor({ doctorId: '' });
     };
 
     const handleConfirmDelete = () => {
@@ -310,7 +313,7 @@ const DoctorManagement = () => {
     const handleCloseUpdateModal = () => {
         setValidationErrors({});
         setIsUpdateModalOpen(false);
-        setPreviewImage({image: ""})
+        setPreviewImage({ image: '' });
     };
 
     const handleUpdateChange = (e) => {
@@ -328,12 +331,12 @@ const DoctorManagement = () => {
             const objectURL = URL.createObjectURL(file);
             setPreviewImage({ image: objectURL }); // Lưu blob URL
         }
-        setSelectedFile(file)
+        setSelectedFile(file);
     };
 
     const handleAddDoctor = () => {
         //Chưa có error do không dùng Thêm
-        alert('Thêm bác sĩ thành công!');
+        toast.success('Thêm bác sĩ thành công!');
         console.log('New Doctor Info:', doctor);
         handleCloseModal();
     };
@@ -355,7 +358,7 @@ const DoctorManagement = () => {
             return; // Ngăn không thêm nếu có lỗi
         }
         updateDoctorAPI(updateDoctor);
-        alert('Cập nhật bác sĩ thành công!');
+        toast.success('Cập nhật bác sĩ thành công!');
         setValidationErrors(errors);
         console.log('Updated Doctor Info:', updateDoctor);
         handleCloseUpdateModal();
@@ -432,10 +435,11 @@ const DoctorManagement = () => {
                     {menuItems.map((item) => (
                         <li
                             key={item.path}
-                            className={`cursor-pointer flex items-center px-4 py-2 rounded ${location.pathname === item.path
-                                ? 'bg-pink-500 text-white' // Nền hồng cho mục hiện tại
-                                : 'hover:bg-gray-200' // Hover hiệu ứng cho mục khác
-                                } ${isExpanded ? 'justify-start' : 'justify-center'}`}
+                            className={`cursor-pointer flex items-center px-4 py-2 rounded ${
+                                location.pathname === item.path
+                                    ? 'bg-pink-500 text-white' // Nền hồng cho mục hiện tại
+                                    : 'hover:bg-gray-200' // Hover hiệu ứng cho mục khác
+                            } ${isExpanded ? 'justify-start' : 'justify-center'}`}
                             onClick={() => navigate(item.path)}
                         >
                             <span className="text-xl">{item.icon}</span>
@@ -471,7 +475,11 @@ const DoctorManagement = () => {
                                 <span className="font-bold">Admin</span>
                                 <div className="w-16 h-16 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
                                     <img
-                                        src={avata ? `http://localhost:9000/uploads/${avata}` : 'http://localhost:3000/src/assets/img/avatar.png'}
+                                        src={
+                                            avata
+                                                ? `http://localhost:9000/uploads/${avata}`
+                                                : 'http://localhost:3000/src/assets/img/avatar.png'
+                                        }
                                         alt="Profile"
                                         className="w-full h-full object-cover"
                                     />
@@ -519,7 +527,12 @@ const DoctorManagement = () => {
                                 onChange={(e) => setFilterValue(e.target.value)}
                                 className="border border-gray-400 rounded px-3 py-2 w-96"
                             />
-                            <button className="bg-gray-200 border border-gray-400 px-4 py-2 rounded" onClick={() => filterDoctorAPI()}>🔍</button>
+                            <button
+                                className="bg-gray-200 border border-gray-400 px-4 py-2 rounded"
+                                onClick={() => filterDoctorAPI()}
+                            >
+                                🔍
+                            </button>
                         </div>
 
                         {/* Nút Thêm */}
@@ -562,28 +575,34 @@ const DoctorManagement = () => {
                                             />
                                         </div>
                                     </td>
-                                    <td className="border border-gray-300 px-4 py-2 text-center">{doctor.doctorId.fullname}</td>
+                                    <td className="border border-gray-300 px-4 py-2 text-center">
+                                        {doctor.doctorId.fullname}
+                                    </td>
                                     <td className="border border-gray-300 px-4 py-2 text-center">
                                         {(() => {
                                             const positionMapping = {
-                                                P0: "Bác sĩ",
-                                                P1: "Trưởng khoa",
-                                                P2: "Giáo sư",
-                                                P3: "Phó giáo sư",
+                                                P0: 'Bác sĩ',
+                                                P1: 'Trưởng khoa',
+                                                P2: 'Giáo sư',
+                                                P3: 'Phó giáo sư',
                                             };
-                                            return positionMapping[doctor.position] || "Không xác định";
+                                            return positionMapping[doctor.position] || 'Không xác định';
                                         })()}
                                     </td>
                                     <td className="border border-gray-300 px-4 py-2 text-center">
                                         {/* {clinics.find(clinic => clinic.clinicId === doctor.clinicId)?.name || "Chưa xác định"} */}
-                                        {doctor.clinicId?.name || "Chưa xác định"} 
+                                        {doctor.clinicId?.name || 'Chưa xác định'}
                                     </td>
                                     <td className="border border-gray-300 px-4 py-2 text-center">
                                         {/* {specialties.find(specialty => specialty.specialtyId === doctor.specialtyId)?.name || "Chưa xác định"} */}
-                                        {doctor.specialtyId?.name || "Chưa xác định"} 
+                                        {doctor.specialtyId?.name || 'Chưa xác định'}
                                     </td>
-                                    <td className="border border-gray-300 px-4 py-2 text-center">{doctor.doctorId.address}</td>
-                                    <td className="border border-gray-300 px-4 py-2 text-center">{doctor.doctorId.phoneNumber}</td>
+                                    <td className="border border-gray-300 px-4 py-2 text-center">
+                                        {doctor.doctorId.address}
+                                    </td>
+                                    <td className="border border-gray-300 px-4 py-2 text-center">
+                                        {doctor.doctorId.phoneNumber}
+                                    </td>
                                     <td className="border border-gray-300 px-4 py-2 text-center space-x-8">
                                         <button className="text-blue-500" onClick={() => getDetailDoctorAPI(doctor)}>
                                             ✏️
@@ -595,7 +614,8 @@ const DoctorManagement = () => {
                     </table>
                     {/* Điều hướng phân trang */}
                     <div className="flex justify-end items-center space-x-4 mt-4">
-                        <select className="border border-gray-400"
+                        <select
+                            className="border border-gray-400"
                             name="number"
                             value={pagination.limit}
                             onChange={handleLimitChange}
@@ -606,15 +626,24 @@ const DoctorManagement = () => {
                         </select>
                     </div>
                     <div className="flex justify-end items-center space-x-4 mt-4">
-                        <button className={`${pagination.page === 1 ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+                        <button
+                            className={`${
+                                pagination.page === 1 ? 'font-normal text-gray-500' : 'font-bold text-blue-500'
+                            }`}
                             onClick={() => handlePageChange(pagination.page - 1)}
-                            disabled={pagination.page === 1}>
+                            disabled={pagination.page === 1}
+                        >
                             Previous
                         </button>
                         <span>
                             Page {pagination.page} of {pagination.totalPages}
                         </span>
-                        <button className={`${pagination.page === pagination.totalPages ? "font-normal text-gray-500" : "font-bold text-blue-500"}`}
+                        <button
+                            className={`${
+                                pagination.page === pagination.totalPages
+                                    ? 'font-normal text-gray-500'
+                                    : 'font-bold text-blue-500'
+                            }`}
                             onClick={() => handlePageChange(pagination.page + 1)}
                             disabled={pagination.page === pagination.totalPages}
                         >
@@ -645,8 +674,9 @@ const DoctorManagement = () => {
                                                 onChange={handleUpdateChange}
                                                 onBlur={handleBlur}
                                                 disabled
-                                                className={`border w-full px-2 py-1 rounded ${validationErrors.fullname ? 'border-red-500' : 'border-gray-100'
-                                                    }`}
+                                                className={`border w-full px-2 py-1 rounded ${
+                                                    validationErrors.fullname ? 'border-red-500' : 'border-gray-100'
+                                                }`}
                                             />
                                             {validationErrors.fullname && (
                                                 <p className="text-red-500 text-sm">{validationErrors.fullname}</p>
@@ -672,7 +702,11 @@ const DoctorManagement = () => {
                                                 onClick={() => imageInputRef.current.click()}
                                             >
                                                 <img
-                                                    src={previewImage.image ? previewImage.image : `http://localhost:9000/uploads/${updateDoctor.image}`}
+                                                    src={
+                                                        previewImage.image
+                                                            ? previewImage.image
+                                                            : `http://localhost:9000/uploads/${updateDoctor.image}`
+                                                    }
                                                     alt="No Image"
                                                     className="w-full h-full object-cover"
                                                 />
@@ -696,8 +730,9 @@ const DoctorManagement = () => {
                                             onChange={handleUpdateChange}
                                             disabled
                                             onBlur={handleBlur}
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.address ? 'border-red-500' : 'border-gray-100'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.address ? 'border-red-500' : 'border-gray-100'
+                                            }`}
                                         />
                                         {validationErrors.address && (
                                             <p className="text-red-500 text-sm">{validationErrors.address}</p>
@@ -712,8 +747,9 @@ const DoctorManagement = () => {
                                             onChange={handleUpdateChange}
                                             disabled
                                             onBlur={handleBlur}
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.phoneNumber ? 'border-red-500' : 'border-gray-100'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.phoneNumber ? 'border-red-500' : 'border-gray-100'
+                                            }`}
                                         />
                                         {validationErrors.phoneNumber && (
                                             <p className="text-red-500 text-sm">{validationErrors.phoneNumber}</p>
@@ -727,8 +763,9 @@ const DoctorManagement = () => {
                                             value={updateDoctor.position}
                                             onChange={handleUpdateChange}
                                             onBlur={handleBlur}
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.position ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.position ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         >
                                             <option value="">Chọn học hàm, học vị</option>
                                             <option value="P0">Bác sĩ</option>
@@ -748,8 +785,9 @@ const DoctorManagement = () => {
                                             value={updateDoctor.price}
                                             onChange={handleUpdateChange}
                                             onBlur={handleBlur}
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.price ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.price ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         />
                                         {validationErrors.price && (
                                             <p className="text-red-500 text-sm">{validationErrors.price}</p>
@@ -762,8 +800,9 @@ const DoctorManagement = () => {
                                             value={updateDoctor.clinicId}
                                             onChange={handleUpdateChange}
                                             onBlur={handleBlur}
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.clinicId ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.clinicId ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         >
                                             <option value="">Chọn bệnh viện</option>
                                             {clinics.map((clinic, index) => (
@@ -783,8 +822,9 @@ const DoctorManagement = () => {
                                             value={updateDoctor.specialtyId}
                                             onChange={handleUpdateChange}
                                             onBlur={handleBlur}
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.specialtyId ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.specialtyId ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         >
                                             <option value="">Chọn chuyên khoa</option> {/* Tùy chọn mặc định */}
                                             {specialties.map((specialty, index) => (
@@ -805,8 +845,9 @@ const DoctorManagement = () => {
                                             onChange={handleUpdateChange}
                                             onBlur={handleBlur}
                                             rows="4"
-                                            className={`border w-full px-2 py-1 rounded ${validationErrors.description ? 'border-red-500' : 'border-gray-400'
-                                                }`}
+                                            className={`border w-full px-2 py-1 rounded ${
+                                                validationErrors.description ? 'border-red-500' : 'border-gray-400'
+                                            }`}
                                         ></textarea>
                                         {validationErrors.description && (
                                             <p className="text-red-500 text-sm">{validationErrors.description}</p>
