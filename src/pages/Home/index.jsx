@@ -234,7 +234,7 @@ function Home() {
             <div className="w-full bg-[#f0f7ff] pt-20">
                 <div className="container mx-auto px-4">
                     <h2 className="text-center text-[28px] font-bold text-[#003366] mb-8">CƠ SỞ Y TẾ</h2>
-                    <div className="relative max-w-screen-xl px-4">
+                    <div className="relative max-w-screen-xl mx-auto px-4">
                         <div className="flex">
                             {facilities
                                 .slice(currentIndexClinic, currentIndexClinic + itemsToShowClinic)
@@ -300,7 +300,7 @@ function Home() {
             <div className="w-full bg-[#f0f7ff] pt-20">
                 <div className="container mx-auto px-4">
                     <h2 className="text-center text-[28px] font-bold text-[#003366] mb-8">BÁC SĨ</h2>
-                    <div className="relative max-w-screen-xl px-4">
+                    <div className="relative max-w-screen-xl mx-auto px-4">
                         <div className="flex">
                             {doctors.slice(currentIndexDoctor, currentIndexDoctor + itemsToShowDoctor).map((doctor) => (
                                 <div
@@ -378,20 +378,22 @@ function Home() {
 
             <div className="w-full bg-[#f0f7ff] pt-20 pb-12">
                 <div className="container mx-auto pb-8">
-                    <h1 className="text-3xl font-bold text-center mb-8 text-[28px]">CHUYÊN KHOA</h1>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                        {specialties.map((specialty, index) => (
-                            <div
-                                key={index}
-                                className="flex flex-col items-center text-center cursor-pointer"
-                                onClick={() => handleGetDoctorBySpecialty(specialty.specialtyId, specialty.name)}
-                            >
-                                <div className="w-32 h- flex items-center justify-center mb-2">
-                                    <img src={`${IMAGE_URL}${specialty.image}`} alt={specialty.name} />
+                    <div className="max-w-screen-xl mx-auto">
+                        <h1 className="text-3xl font-bold text-center mb-8 text-[28px]">CHUYÊN KHOA</h1>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                            {specialties.map((specialty, index) => (
+                                <div
+                                    key={index}
+                                    className="flex flex-col items-center text-center cursor-pointer"
+                                    onClick={() => handleGetDoctorBySpecialty(specialty.specialtyId, specialty.name)}
+                                >
+                                    <div className="w-32 h- flex items-center justify-center mb-2">
+                                        <img src={`${IMAGE_URL}${specialty.image}`} alt={specialty.name} />
+                                    </div>
+                                    <span className="text-2xl">{specialty.name}</span>
                                 </div>
-                                <span className="text-2xl">{specialty.name}</span>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
