@@ -74,9 +74,9 @@ function Specialties() {
                         />
                         <div>
                             <h3 className="text-blue-400 font-medium mb-2 text-3xl">{dept.name}</h3>
-                            {/* <div className="flex items-start gap-2 text-gray-600 text-2xl">
+                            <div className="flex items-start gap-2 text-gray-600 text-2xl">
                                 <span>{dept.description}</span>
-                            </div> */}
+                            </div>
                         </div>
                     </button>
                 ))}
