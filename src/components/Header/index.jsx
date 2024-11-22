@@ -7,6 +7,7 @@ import { IoLogOutOutline } from 'react-icons/io5';
 import { IoMdKey } from 'react-icons/io';
 import { axiosInstance } from '~/api/apiRequest';
 import avatar from '../../assets/img/avatar.png';
+import Logo from '~/components/Logo';
 function Header() {
     const IMAGE_URL = 'http://localhost:9000/uploads';
 
@@ -63,10 +64,7 @@ function Header() {
                         }}
                         className="flex-shrink-0 flex items-center mr-auto"
                     >
-                        <span className="text-4xl font-bold">
-                            <span className="text-green-500">Easy</span>
-                            <span className="text-blue-500">Med</span>
-                        </span>
+                        <Logo/>
                     </NavLink>
 
                     {/* Navigation */}

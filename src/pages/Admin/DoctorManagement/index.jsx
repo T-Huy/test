@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { IoMenu } from 'react-icons/io5';
 import { UserContext } from '~/context/UserContext';
 import { axiosInstance } from '~/api/apiRequest';
+import Logo from '~/components/Logo';
 
 const DoctorManagement = () => {
     const [isExpanded, setIsExpanded] = useState(true);
@@ -451,16 +452,16 @@ const DoctorManagement = () => {
                     <div className="border-t border-gray-400"></div>
                     <div className="bg-gray-200 mx-auto">
                         <div className="flex justify-between items-center">
-                            <div className="flex items-center space-x-4">
-                                <img
+                            <div className="flex items-center space-x-4 ml-4">
+                                {/* <img
                                     src={
                                         'https://phuongnamvina.com/img_data/images/logo-benh-vien.jpg' ||
                                         'https://via.placeholder.com/150'
                                     }
                                     alt="Logo"
                                     className="w-24 h-24 object-contain"
-                                />
-                                <h1 className="text-5xl font-bold">EasyMed</h1>
+                                /> */}
+                                <Logo/>
                             </div>
                             {/* Admin và Menu */}
                             <div
