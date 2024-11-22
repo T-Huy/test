@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useContext } from 'react';
 import { UserContext } from '../../context/UserContext';
@@ -22,8 +22,9 @@ function Login() {
     }, []);
 
     const navigate = useNavigate();
+    const location = useLocation();
 
-    const { loginContext } = useContext(UserContext);
+    const { user, loginContext } = useContext(UserContext);
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -54,6 +55,10 @@ function Login() {
         }
     };
 
+    if (user.auth) {
+        navigate('/', { replace: true });
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -67,12 +72,13 @@ function Login() {
                 toast.success('Đăng nhập thành công');
                 const decodeToken = jwtDecode(res.access_token);
                 console.log(decodeToken.roleId);
-
+                
                 if (decodeToken.roleId === 'R1') {
-                    navigate('/admin/clinic');
-                } else if (decodeToken.roleId === 'R2') navigate('/doctor/');
-                else {
-                    navigate('/');
+                    navigate('/admin/clinic', { replace: true });
+                } else if (decodeToken.roleId === 'R2') {
+                    navigate('/doctor/', { replace: true });
+                } else if (decodeToken.roleId === 'R3') {
+                    navigate('/', { replace: true });
                 }
             } else {
                 toast.error('Đăng nhập thất bại');

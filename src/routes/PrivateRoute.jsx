@@ -1,9 +1,7 @@
 import { useContext } from 'react';
-import { Routes, Route, Outlet } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
+import { Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom';
 
-function PrivateRoute({ isAllowed, redirectPath='/login', children }) {
-    
+function PrivateRoute({ isAllowed, redirectPath = '/login', children }) {
 
     if (!isAllowed) {
         return <Navigate to={redirectPath} replace />;
