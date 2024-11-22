@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { axiosClient, axiosInstance } from '~/api/apiRequest';
 import { UserContext } from '~/context/UserContext';
@@ -11,7 +11,9 @@ function PatientManagement() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate(); // Thêm useNavigate
-    
+
+    const { user } = useContext(UserContext);
+
     useEffect(() => {
         // Đặt ngày mặc định là ngày hiện tại khi component được tải
         const today = new Date().toISOString().split('T')[0];
@@ -25,7 +27,7 @@ function PatientManagement() {
             setError(null);
 
             try {
-                const response = await axiosInstance.get(`/booking/doctor/8?date=${selectedDate}`);
+                const response = await axiosInstance.get(`/booking/doctor/${user.userId}?date=${selectedDate}`);
                 console.log('ResponseBooking:', response);
 
                 if (response.status === 'OK') {
