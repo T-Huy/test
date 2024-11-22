@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Logo from '../Logo';
 
 const Sidebar = ({ onSelectTab, selectedTab }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -115,8 +116,8 @@ const Sidebar = ({ onSelectTab, selectedTab }) => {
 
     return (
         <div className="w-fit h-screen bg-white text-black flex flex-col shadow-lg">
-            <div className="text-xl font-bold text-center py-6 border-b border-gray-200 flex items-center">
-                <img
+            <div className="text-xl font-bold text-center py-6 border-b border-gray-200 flex items-center justify-center">
+                {/* <img
                     src={pngegg}
                     alt="Logo"
                     className="mx-auto mb-2"
@@ -127,7 +128,8 @@ const Sidebar = ({ onSelectTab, selectedTab }) => {
                     <small>
                         Chăm sóc sức khỏe <br /> Bảo vệ cuộc sống
                     </small>
-                </div>
+                </div> */}
+                <Logo />
             </div>
 
             <div className="flex-1">
