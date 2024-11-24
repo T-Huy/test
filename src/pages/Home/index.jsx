@@ -200,11 +200,11 @@ function Home() {
                     {/* Lớp phủ để làm mờ */}
                     {/* <div className="absolute inset-0 bg-slate-400 opacity-30 z-10"></div> */}
                     {/* Search */}
-                    <div className="absolute left-0 right-0 top-52 z-20 max-w-5xl mx-auto ">
-                        <h1 className="text-3xl md:text-4xl font-bold text-blue-500 text-center mb-4">
+                    <div className="absolute left-0 right-0 top-72 z-20 max-w-6xl mx-auto ">
+                        <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
                             Nền tảng công nghệ
                         </h1>
-                        <h2 className="text-4xl md:text-5xl font-bold text-slate-900 text-center mb-8">
+                        <h2 className="text-6xl md:text-6xl font-black text-blue-600 text-center mb-8">
                             Kết nối người dân với Cơ sở - Dịch vụ Y tế
                         </h2>
                         {/* <div className="relative mb-8">
